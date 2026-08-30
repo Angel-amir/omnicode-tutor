@@ -17,3 +17,6 @@ The widget must have this strict structure:
 4. **Bottom Explanation:** Text explaining the exact logic of THAT particular line of code.
 
 Key difference: Unlike the `animator` (which abstracts macro-level concepts like VisuAlgo), THIS skill is strictly for micro-logic debugging and variable tracking.
+
+## 🚧 Planned Enhancements
+- **Robustness:** Needs to support deeper execution traces, call stack visualization (recursion), and multi-file debugging.

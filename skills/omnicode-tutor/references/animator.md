@@ -23,3 +23,6 @@ The text in the Tutor Panel MUST NOT be a simple technical description.
 
 ### 3. Dynamic Data Context
 If the user does not provide code, read `STUDENT_PROFILE.md` and use the guidelines in `data_simulator.md` to generate a domain-based data structure before animating.
+
+## 🚧 Planned Enhancements
+- **Robustness:** Currently a basic mockup logic. Needs to be expanded to support more complex data structures (trees, graphs) and smoother physics-based animations.
