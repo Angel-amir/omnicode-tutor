@@ -39,7 +39,7 @@ if [ -L "$SKILL_LINK" ] || [ -d "$SKILL_LINK" ]; then
 fi
 
 echo "🔗 Creando enlace simbólico..."
-ln -s "$DEST_DIR" "$SKILL_LINK"
+ln -s "$DEST_DIR/skills/omnicode-tutor" "$SKILL_LINK"
 
 echo ""
 echo "✅ ¡Omnicode Tutor instalado con éxito!"

@@ -35,10 +35,10 @@ curl -sSL https://raw.githubusercontent.com/Angel-amir/omnicode-tutor/main/scrip
    ```bash
    git clone https://github.com/Angel-amir/omnicode-tutor.git
    ```
-2. Crea un enlace simbólico en el directorio de skills de tu agente:
+2. Crea un enlace simbólico que apunte EXCLUSIVAMENTE a la carpeta de la skill:
    ```bash
    mkdir -p ~/.gemini/config/skills
-   ln -s "$(pwd)/omnicode-tutor" ~/.gemini/config/skills/omnicode-tutor
+   ln -s "$(pwd)/omnicode-tutor/skills/omnicode-tutor" ~/.gemini/config/skills/omnicode-tutor
    ```
 
 ## 🎮 Primeros Pasos
