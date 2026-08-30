@@ -23,3 +23,8 @@ The file must contain the following sections:
 
 ### 3. Chat Communication
 Do not copy and paste the entire document into the chat every time you update it. Be discreet. Say something like: *"💾 Game saved. I've updated your record adding experience in [Topic]."*, and give them the link to the file.
+
+## 🚧 Quarantine Notice
+> [!WARNING]
+> **Status: Quarantined / Work in Progress**
+> This module is currently in quarantine and slated for a major refactor in the short term. Its tracking logic will be completely overhauled to integrate deeply with the upcoming syllabus generator.
