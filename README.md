@@ -20,30 +20,24 @@ Unlike monolithic prompts, Omnicode uses **Dynamic Context Loading**. The master
 - `data_simulator.md`: Generation of realistic datasets with intentional "noise".
 - `inspector.md` / `animator.md`: Stress testing and memory visualization.
 
-## 📦 Global Installation (Plug-and-Play)
+## 📦 Install
 
-Omnicode Tutor is packaged as a **Global Skill**. Once installed, you can invoke it in *any* project you are working on.
+**Automatic Install (Recommended)**
 
-### 🧩 Requirements (Dependencies)
-Omnicode Tutor requires the **`diagram-design`** skill to comply with Rule 3 (Strict Visual Quality). 
-*If you use the automatic installation script (Option A), the dependency will be magically installed for you.*
+Run this command in your terminal to download and install the pure skill in your local configuration. It handles everything automatically:
 
-### Option A: Automatic Installation (Recommended)
-Run this command in your terminal to download and install the pure skill in your local configuration:
 ```bash
 curl -sSL https://raw.githubusercontent.com/Angel-amir/omnicode-tutor/main/scripts/install.sh | bash
 ```
 
-### Option B: Manual Installation
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Angel-amir/omnicode-tutor.git
-   ```
-2. Create a symbolic link pointing EXCLUSIVELY to the skill folder:
-   ```bash
-   mkdir -p ~/.gemini/config/skills
-   ln -s "$(pwd)/omnicode-tutor/skills/omnicode-tutor" ~/.gemini/config/skills/omnicode-tutor
-   ```
+### Editable Install (For Contributors)
+
+If you plan to modify the skill's source code or contribute to the project, clone the repo and symlink the inner skill folder:
+
+```bash
+git clone https://github.com/Angel-amir/omnicode-tutor.git
+ln -s "$(pwd)/omnicode-tutor/skills/omnicode-tutor" ~/.gemini/config/skills/omnicode-tutor
+```
 
 ## 🎮 Getting Started
 
