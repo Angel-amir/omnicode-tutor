@@ -1,16 +1,16 @@
-# ADR 0001: Implementación de Dynamic Context Loading y Flattening de Skill
+# ADR 0001: Implementation of Dynamic Context Loading and Skill Flattening
 
-**Fecha:** 2026-08-30
-**Estado:** Aceptado
+**Date:** 2026-08-30
+**Status:** Accepted
 
-## Contexto
-Originalmente, el orquestador del tutor (`SKILL.md`) y las referencias estaban dispersos, y las reglas globales se encontraban en un archivo `AGENTS.md` dependiente del espacio de trabajo local.
+## Context
+Originally, the tutor's orchestrator (`SKILL.md`) and references were scattered, and the global rules were located in an `AGENTS.md` file dependent on the local workspace.
 
-## Decisión
-1. **Dynamic Context Loading:** Adoptamos una arquitectura basada en intención. `SKILL.md` actúa como el orquestador maestro que lee la petición del usuario y enruta la lectura a módulos especializados en la carpeta `references/`.
-2. **Flattening de Repositorio:** El repositorio fue reestructurado para que su raíz actúe directamente como la Skill global. Esto facilita que cualquier usuario instale la skill en `~/.gemini/config/skills/omnicode-tutor`.
-3. **Encapsulamiento de Reglas:** Movimos las reglas pedagógicas ("Cero Spoilers", "Método Socrático") directamente al `SKILL.md` para hacer la skill 100% portátil e independiente del espacio de trabajo.
+## Decision
+1. **Dynamic Context Loading:** We adopted an intent-based architecture. `SKILL.md` acts as the master orchestrator that reads the user's request and routes the reading to specialized modules in the `references/` folder.
+2. **Repository Restructuring:** The repository was restructured so that the `skills/omnicode-tutor/` subfolder acts purely as the skill, separating the development files (docs, scripts) from the final agent payload.
+3. **Rule Encapsulation:** We moved the pedagogical rules ("Zero Spoilers", "Socratic Method") directly to `SKILL.md` to make the skill 100% portable and independent of the workspace.
 
-## Consecuencias
-* **Positivas:** Escalabilidad horizontal casi infinita (podemos agregar más archivos `.md` a `references/` sin saturar la ventana de contexto de la IA). La skill es ahora distribuible.
-* **Negativas:** Obliga a los desarrolladores a ser meticulosos manteniendo actualizadas las rutas relativas en la matriz de enrutamiento del orquestador.
+## Consequences
+* **Positive:** Near-infinite horizontal scalability (we can add more `.md` files to `references/` without saturating the AI's context window). Clean separation of concerns.
+* **Negative:** Forces developers to be meticulous in keeping relative paths updated in the orchestrator's routing matrix.

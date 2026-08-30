@@ -1,23 +1,22 @@
-# Guía de Contribución 🤝
+# Contribution Guide 🤝
 
-¡Gracias por tu interés en mejorar el Socratic AI Tutor Framework!
+Thank you for your interest in improving the Omnicode Tutor Framework!
 
-Este proyecto busca expandir las capacidades pedagógicas de los agentes IA. Al crear nuevas skills, debes apegarte estrictamente a nuestra arquitectura.
+This project seeks to expand the pedagogical capabilities of AI agents. When creating new modules or contributing, you must strictly adhere to our architecture.
 
-## Creando una Nueva Skill
+## Creating a New Module
 
-Toda skill nueva debe ubicarse en la carpeta `skills/[nombre-de-tu-skill]/`. 
-No pongas reglas teóricas masivas dentro del archivo `SKILL.md`.
+Any new module must be located in the `skills/omnicode-tutor/references/` folder.
+Do not put massive theoretical rules directly inside the `SKILL.md` orchestrator.
 
-**Flujo Correcto:**
-1. Escribe el `SKILL.md` enfocándote en los **Triggers** (Cuándo debe activarse).
-2. Si tu skill requiere teoría pesada (Ej. "Reglas de Clean Architecture"), crea un archivo Markdown en la carpeta `references/`.
-3. Dentro de tu `SKILL.md`, instruye al agente a cargar y leer tu archivo de referencias cuando se active.
+**Correct Flow:**
+1. Write your module (e.g., `design_patterns.md`) focusing on specific pedagogy.
+2. Update the routing matrix in `SKILL.md` by instructing the agent to load and read your reference file when a specific trigger occurs.
 
-## Tipos de Skills Aceptadas
+## Types of Accepted Modules
 
-1. **Contextuales:** Deben leer OBLIGATORIAMENTE el `PERFIL_ESTUDIANTE.md` para mimetizarse con el entorno del usuario.
-2. **Genéricas:** Herramientas universales (analizadores de rendimiento, visualizadores de RAM) que funcionan sin importar el lenguaje de programación elegido.
+1. **Contextual:** Must MANDATORILY read the `STUDENT_PROFILE.md` file to mimic the user's domain and environment.
+2. **Generic:** Universal tools (performance analyzers, RAM visualizers) that work regardless of the chosen programming language.
 
-## Calidad Visual
-No aceptamos Pull Requests que utilicen diagramas ASCII o Mermaid para las salidas hacia el estudiante. Cualquier output visual debe integrarse con el motor de renderizado HTML/SVG de diseño editorial estipulado en `AGENTS.md`.
+## Visual Quality
+We do not accept Pull Requests that use ASCII or Mermaid diagrams for output to the student. Any visual output must integrate with the `diagram-design` skill to ensure editorial design quality.

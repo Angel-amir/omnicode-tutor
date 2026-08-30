@@ -1,56 +1,56 @@
 # Omnicode Tutor Framework 🎓
 
-Un framework open-source diseñado para transformar agentes de Inteligencia Artificial (Antigravity / Gemini) en tutores pedagógicos estrictos. En lugar de darte la respuesta y hacerte el trabajo, este framework obliga a la IA a utilizar el Método Socrático, animaciones de memoria y simulaciones de datos para garantizar un aprendizaje profundo y real.
+An open-source framework designed to transform Artificial Intelligence agents (Antigravity / Gemini) into strict pedagogical tutors. Instead of giving you the answer and doing the work for you, this framework forces the AI to use the Socratic Method, memory animations, and data simulations to ensure deep and real learning.
 
-## 🚀 Filosofía (Anti-Spoilers)
+## 🚀 Philosophy (Anti-Spoilers)
 
-Los Modelos de Lenguaje actuales son "perezosos" y complacientes: si tienes un error, te escupen el código corregido. Eso arruina la curva de aprendizaje. 
+Current Large Language Models are "lazy" and compliant: if you have a bug, they spit out the corrected code. That ruins the learning curve.
 
-Este framework interviene la arquitectura del agente imponiendo:
-1. **Cero Spoilers:** Prohibición absoluta de dar la solución.
-2. **Regla de las 3 Vidas:** Solo tras 3 intentos fallidos, el tutor ofrece una intervención directa.
-3. **Calidad Visual Estricta:** Uso obligatorio de diagramas editoriales (HTML/SVG) y UI generativa para explicar conceptos lógicos y arquitectónicos.
+This framework overrides the agent's architecture by imposing:
+1. **Zero Spoilers:** Absolute prohibition of giving the solution.
+2. **The 3-Lives Rule:** Only after 3 failed attempts does the tutor offer direct intervention.
+3. **Strict Visual Quality:** Mandatory use of editorial diagrams (HTML/SVG) and generative UI to explain logical and architectural concepts.
 
-## ⚙️ Arquitectura: Dynamic Context Loading
+## ⚙️ Architecture: Dynamic Context Loading
 
-A diferencia de prompts monolíticos, Omnicode utiliza **Carga de Contexto Dinámico**. El `SKILL.md` maestro actúa como un enrutador inteligente que lee la intención del estudiante y carga el módulo pedagógico adecuado (desde `references/`) **sin saturar la memoria** del agente:
+Unlike monolithic prompts, Omnicode uses **Dynamic Context Loading**. The master `SKILL.md` acts as a smart router that reads the student's intent and loads the appropriate pedagogical module (from `references/`) **without saturating the agent's memory**:
 
-- `tutor_contextual.md`: Teoría con analogías de tu dominio (ej. Finanzas, Videojuegos).
-- `metodo_socratico.md`: Interrogación guiada interactiva para debugear código.
-- `simulador_datos.md`: Generación de datasets realistas con "ruido" intencional.
-- `inspector.md` / `animador.md`: Pruebas de estrés y visualización de memoria.
+- `contextual_tutor.md`: Theory with analogies from your domain (e.g. Finance, Video Games).
+- `socratic_method.md`: Interactive guided interrogation to debug code.
+- `data_simulator.md`: Generation of realistic datasets with intentional "noise".
+- `inspector.md` / `animator.md`: Stress testing and memory visualization.
 
-## 📦 Instalación Global (Plug-and-Play)
+## 📦 Global Installation (Plug-and-Play)
 
-Omnicode Tutor está empaquetado como una **Skill Global**. Una vez instalado, podrás invocarlo en *cualquier* proyecto en el que estés trabajando.
+Omnicode Tutor is packaged as a **Global Skill**. Once installed, you can invoke it in *any* project you are working on.
 
-### 🧩 Requisitos (Dependencias)
-Omnicode Tutor requiere la skill **`diagram-design`** para cumplir con la Regla 3 (Calidad Visual Estricta). 
-*Si usas el script de instalación automática (Opción A), la dependencia se instalará por ti mágicamente.*
+### 🧩 Requirements (Dependencies)
+Omnicode Tutor requires the **`diagram-design`** skill to comply with Rule 3 (Strict Visual Quality). 
+*If you use the automatic installation script (Option A), the dependency will be magically installed for you.*
 
-### Opción A: Instalación Automática (Recomendada)
-Ejecuta este comando en tu terminal para clonar e instalar la skill en tu configuración local:
+### Option A: Automatic Installation (Recommended)
+Run this command in your terminal to download and install the pure skill in your local configuration:
 ```bash
 curl -sSL https://raw.githubusercontent.com/Angel-amir/omnicode-tutor/main/scripts/install.sh | bash
 ```
 
-### Opción B: Instalación Manual
-1. Clona este repositorio:
+### Option B: Manual Installation
+1. Clone this repository:
    ```bash
    git clone https://github.com/Angel-amir/omnicode-tutor.git
    ```
-2. Crea un enlace simbólico que apunte EXCLUSIVAMENTE a la carpeta de la skill:
+2. Create a symbolic link pointing EXCLUSIVELY to the skill folder:
    ```bash
    mkdir -p ~/.gemini/config/skills
    ln -s "$(pwd)/omnicode-tutor/skills/omnicode-tutor" ~/.gemini/config/skills/omnicode-tutor
    ```
 
-## 🎮 Primeros Pasos
+## 🎮 Getting Started
 
-1. Abre cualquier proyecto de código en tu editor.
-2. Habla con tu agente y dile: *"Inicia Omnicode Tutor"* o *"Ayúdame a estudiar"*.
-3. El tutor detectará si tienes un archivo de perfil en ese proyecto. Si no, lanzará un **cuestionario de Onboarding interactivo**.
-4. Se autogenerará un archivo `PERFIL_ESTUDIANTE.md` en la raíz de tu proyecto, calibrando el lenguaje de programación, tu área de interés y tu nivel.
+1. Open any code project in your editor.
+2. Talk to your agent and say: *"Start Omnicode Tutor"* or *"Help me study"*.
+3. The tutor will detect if you have a profile file in that project. If not, it will launch an **interactive Onboarding questionnaire**.
+4. A `STUDENT_PROFILE.md` file will be auto-generated at the root of your project, calibrating the programming language, your area of interest, and your level.
 
 ---
-*Construido aplicando patrones de escalabilidad arquitectónica para sistemas de agentes autónomos.*
+*Built applying architectural scalability patterns for autonomous agent systems.*
