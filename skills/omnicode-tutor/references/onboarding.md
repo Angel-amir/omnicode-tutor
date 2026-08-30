@@ -1,29 +1,28 @@
+# Student Profile Onboarding
 
-# Onboarding de Perfil del Estudiante
+## When to use this skill
+Triggered automatically in two scenarios:
+1. The user starts a conversation and the `STUDENT_PROFILE.md` file DOES NOT exist or is empty.
+2. The user explicitly asks to "configure my profile", "start setup", or "change my context".
 
-## Cuándo usar esta skill
-Se activa de forma automática en dos escenarios:
-1. El usuario inicia una conversación y el archivo `PERFIL_ESTUDIANTE.md` NO existe o está vacío.
-2. El usuario explícitamente pide "configurar mi perfil", "iniciar setup" o "cambiar mi contexto".
+## Execution Rules
 
-## Reglas de Ejecución
+Your goal is to interview the user to extract the necessary information and then auto-generate their profile file. Follow these steps:
 
-Tu objetivo es entrevistar al usuario para extraer la información necesaria y luego autogenerar su archivo de perfil. Sigue estos pasos:
+### 1. The Interview (UI Usage)
+Use the `ask_question` tool to launch an interactive multiple-choice questionnaire for the user. Make it friendly but direct. 
+You must find out:
+- **Topic of Study:** What language or technology do they want to learn?
+- **Domain of Interest:** What area do they work in or are passionate about? (e.g., Medicine, Finance, Video Games).
+- **Current Level:** (Beginner, Intermediate, Advanced).
+- **Tutor Tone:** Do they prefer a strict, patient, academic, or colloquial approach?
 
-### 1. La Entrevista (Uso de UI)
-Utiliza la herramienta `ask_question` para lanzar un cuestionario interactivo múltiple al usuario. Hazlo amigable pero directo. 
-Debes averiguar:
-- **Tema de Estudio:** ¿Qué lenguaje o tecnología quiere aprender?
-- **Dominio de Interés:** ¿En qué área trabaja o le apasiona? (Ej. Medicina, Finanzas, Videojuegos).
-- **Nivel Actual:** (Principiante, Intermedio, Avanzado).
-- **Tono del Tutor:** ¿Prefiere un trato estricto, paciente, académico, coloquial?
+*Note: Allow common predefined options but always make sure to enable the write-in field.*
 
-*Nota: Permite opciones predefinidas comunes pero asegúrate de habilitar siempre el campo de escritura libre (write-in).*
+### 2. File Generation
+Once the user submits the form with their answers:
+- Take that information and use the `write_to_file` tool to create or overwrite the `STUDENT_PROFILE.md` file in the project root.
+- The file must be cleanly structured in Markdown, using bullet points for each parameter.
 
-### 2. Generación del Archivo
-Una vez que el usuario envíe el formulario con sus respuestas:
-- Toma esa información y usa la herramienta `write_to_file` para crear o sobrescribir el archivo `PERFIL_ESTUDIANTE.md` en la raíz del proyecto.
-- El archivo debe estar estructurado de forma limpia en Markdown, usando viñetas para cada parámetro.
-
-### 3. Confirmación
-Informa al usuario que su entorno ha sido configurado con éxito. Di algo como: *"Setup completado. He creado tu perfil. Todo el framework (tutor, simuladores y diagramas) se ha calibrado para enseñarte [Tema] usando el contexto de [Dominio]. ¿Por dónde quieres empezar?"*
+### 3. Confirmation
+Inform the user that their environment has been successfully configured. Say something like: *"Setup complete. I have created your profile. The entire framework (tutor, simulators, and diagrams) has been calibrated to teach you [Topic] using the context of [Domain]. Where do you want to start?"*
