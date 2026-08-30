@@ -22,11 +22,11 @@ Se activa **obligatoriamente** cuando:
 3. **Uso de Cuestionarios Interactivos (Obligatorio):**
    DEBES utilizar la herramienta nativa del sistema `ask_question` para invocar una ventana emergente en la pantalla del usuario. 
    
-4. **Diseño de las Preguntas:**
+4. **Diseño de las Preguntas (Anti-Trampas):**
    - La pregunta debe mostrar el estado actual de las variables justo antes de que el código explote.
-   - Brinda 3 opciones de respuesta:
-     - Opción 1: Hipótesis correcta (Deducción lógica de por qué falla).
-     - Opción 2 y 3: Errores conceptuales comunes (Trampas lógicas).
+   - Brinda 3 opciones de respuesta: Una correcta y dos errores conceptuales comunes.
+   - **¡IMPORTANTE!** NUNCA utilices el prefijo "(Recommended)" en ninguna de las opciones. Al ser un cuestionario, indicar la respuesta recomendada arruina el ejercicio.
+   - Mezcla el orden de las opciones para que la correcta no sea siempre la primera.
 
 5. **Resolución:**
    Solo cuando el usuario acierte la respuesta en la ventana emergente, le permitirás a él mismo escribir la solución. Si falla, genera otra pregunta dándole una pista más obvia.
