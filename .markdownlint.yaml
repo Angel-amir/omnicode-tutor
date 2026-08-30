@@ -1,0 +1,7 @@
+MD013: false # Line length
+MD022: false # Blanks around headings
+MD032: false # Blanks around lists
+MD009: false # Trailing spaces
+MD004: false # Unordered list style
+MD030: false # Spaces after list markers
+MD036: false # Emphasis used instead of a heading
