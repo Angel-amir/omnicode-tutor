@@ -20,7 +20,7 @@ El widget DEBE tener 3 secciones visuales claras:
 ### 2. Calidad de la Explicación (El Porqué)
 El texto en el Panel del Tutor NO debe ser una simple descripción técnica. 
 - ❌ **Incorrecto:** "La variable i es 1. El arreglo recibe el número 180."
-- ✅ **Correcto:** "El sensor capturó 180 BPM. Como 180 supera nuestro límite seguro de 100, la condición del `if` se vuelve verdadera. Observa cómo el algoritmo aísla esta lectura moviéndola al arreglo de 'Taquicardias' para su posterior análisis."
+- ✅ **Correcto (Ejemplo si el dominio fuera Medicina):** "El sensor capturó 180 BPM. Como 180 supera nuestro límite seguro de 100, la condición del `if` se vuelve verdadera. Observa cómo el algoritmo aísla esta lectura moviéndola al arreglo de 'Taquicardias' para su posterior análisis." *(Nota: Adapta SIEMPRE la narrativa al dominio real del perfil del usuario).*
 
-### 3. Contexto Biomédico
-Si el usuario no provee código, invoca el `simulador-biosenales` para generar un escenario médico antes de animar.
+### 3. Contexto de Datos Dinámico
+Si el usuario no provee código, lee el `PERFIL_ESTUDIANTE.md` y usa las directrices de `simulador_datos.md` para generar una estructura de datos basada en su dominio antes de animar.
