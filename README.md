@@ -24,6 +24,10 @@ A diferencia de prompts monolíticos, Omnicode utiliza **Carga de Contexto Diná
 
 Omnicode Tutor está empaquetado como una **Skill Global**. Una vez instalado, podrás invocarlo en *cualquier* proyecto en el que estés trabajando.
 
+### 🧩 Requisitos (Dependencias)
+Omnicode Tutor requiere la skill **`diagram-design`** para cumplir con la Regla 3 (Calidad Visual Estricta). 
+*Si usas el script de instalación automática (Opción A), la dependencia se instalará por ti mágicamente.*
+
 ### Opción A: Instalación Automática (Recomendada)
 Ejecuta este comando en tu terminal para clonar e instalar la skill en tu configuración local:
 ```bash
