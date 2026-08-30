@@ -1,7 +1,3 @@
----
-name: tutor-codigo-visual
-description: Clon de Python Tutor. Genera un widget HTML interactivo que muestra la ejecución de un algoritmo línea por línea, animando cómo cambian las variables locales y la memoria (Micro-lógica).
----
 
 # Tutor de Código Visual (Python Tutor Clon)
 

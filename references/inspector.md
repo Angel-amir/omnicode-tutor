@@ -1,7 +1,3 @@
----
-name: inspector-rendimiento
-description: Mentor de arquitectura y optimización. Analiza código funcional del usuario para introducir conceptos de Notación Big-O, Clean Code y escalabilidad en servidores backend.
----
 
 # Inspector de Rendimiento (Mentor de Código Limpio)
 

@@ -1,7 +1,3 @@
----
-name: rastreador-progreso
-description: Mantiene un registro persistente (Artefacto) del aprendizaje del usuario. Actúa como un 'Save Game' para rastrear conceptos dominados, puntos débiles y el progreso en su ruta de aprendizaje.
----
 
 # Rastreador de Progreso (Expediente de Aprendizaje)
 

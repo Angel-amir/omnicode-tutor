@@ -1,7 +1,3 @@
----
-name: simulador-datos-contexto
-description: Genera conjuntos de datos realistas (arrays, JSON) basados en el perfil del usuario para inyectar en ejercicios de programación.
----
 
 # Simulador de Datos Contextuales
 

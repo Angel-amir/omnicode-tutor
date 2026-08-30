@@ -1,7 +1,3 @@
----
-name: tutor-contextual
-description: Activa un flujo de estudio interactivo, adaptando las explicaciones y el código al perfil y contexto del estudiante definidos en PERFIL_ESTUDIANTE.md.
----
 
 # Tutor Contextual
 

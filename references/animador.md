@@ -1,7 +1,3 @@
----
-name: animador-algoritmos
-description: Genera widgets HTML interactivos (Generative UI) para animar estructuras de datos y algoritmos paso a paso, acompañados de explicaciones analíticas detalladas.
----
 
 # Animador de Algoritmos (VisuAlgo + IA)
 

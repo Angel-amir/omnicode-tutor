@@ -1,7 +1,3 @@
----
-name: onboarding-perfil
-description: Entrevista interactiva para configurar el entorno de estudio y generar automáticamente el PERFIL_ESTUDIANTE.md del usuario.
----
 
 # Onboarding de Perfil del Estudiante
 
