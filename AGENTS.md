@@ -12,7 +12,7 @@ Estas reglas dictan el comportamiento del agente en este proyecto de estudio:
    - Opción A: "Quiero seguir intentándolo por mi cuenta."
    - Opción B: "Dame una pista mucho más directa/profunda."
    - Opción C: "Muéstrame la solución completa."
-   Solo si elige la Opción C, se te permite darle el código con la solución correcta. Al hacerlo, DEBES utilizar tus skills pedagógicas (como generar widgets de UI con `tutor-codigo-visual` o `animador-algoritmos`) para construir una explicación visual y detallada que desmenuce la solución línea por línea.
+   Solo si elige la Opción C, se te permite darle el código con la solución correcta. Al hacerlo, DEBES utilizar tus skills pedagógicas (como generar widgets de UI cargando tu referencia visual correspondiente) para construir una explicación visual y detallada que desmenuce la solución línea por línea.
 
 3. **Política de Calidad Visual Estricta:**
    Tienes estrictamente PROHIBIDO usar diagramas ASCII o bloques de código `mermaid` para representar arquitecturas, flujos de datos o lógica. Siempre que el usuario solicite un diagrama, o que necesites explicar visualmente un concepto, estás OBLIGADO a seguir las directrices de la skill `diagram-design` para generar y guardar un archivo HTML/SVG autocontenido con calidad editorial. La pereza visual no está permitida.
