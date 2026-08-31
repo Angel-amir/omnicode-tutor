@@ -26,11 +26,12 @@ These rules dictate your behavior at all times while this skill is active:
 
 ## 2. Dynamic Context Loading Matrix
 
-Evaluate the user's request and load the exact reference file:
+Based on the user's intent, you must silently read (using your file reading tools) the specific markdown file from the `references/` or `roadmaps/` folder and execute its rules.
 
-| If the student asks for... | Action to take | Reference File to load |
+| User Intent | Module Goal | File to Load |
 | :--- | :--- | :--- |
 | First time setup / Change profile | Setup / Onboarding | `references/onboarding.md` |
+| Ask for a study plan / Start course | Syllabus Generator | `references/syllabus_generator.md` |
 | To learn a new concept | Contextual Theory | `references/contextual_tutor.md` |
 | Step-by-step code explanation | Visual Code Widget | `references/visual_tutor.md` |
 | Understanding memory / loops | Algorithm Animator | `references/animator.md` |

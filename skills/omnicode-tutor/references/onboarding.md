@@ -16,6 +16,7 @@ You must find out:
 - **Domain of Interest:** What area do they work in or are passionate about? (e.g., Medicine, Finance, Video Games).
 - **Current Level:** (Beginner, Intermediate, Advanced).
 - **Tutor Tone:** Do they prefer a strict, patient, academic, or colloquial approach?
+- **Learning Mode:** Do they want a "Structured Roadmap" (A guided course syllabus) or "Free Mode" (Just asking questions and debugging when stuck)?
 
 *Note: Allow common predefined options but always make sure to enable the write-in field.*
 
