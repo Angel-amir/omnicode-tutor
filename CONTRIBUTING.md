@@ -20,3 +20,11 @@ Do not put massive theoretical rules directly inside the `SKILL.md` orchestrator
 
 ## Visual Quality
 We do not accept Pull Requests that use ASCII or Mermaid diagrams for output to the student. Any visual output must integrate with the `diagram-design` skill to ensure editorial design quality.
+
+## Roadmap Design Standards (Curriculum Guidelines)
+When submitting a new pre-loaded syllabus to the `roadmaps/` directory, you must follow the **Literature-Backed Rule**:
+
+1. **Based on Best-in-Class Books:** Do not invent syllabuses from scratch. Every template must be a curation or fusion of the Table of Contents from the industry's most respected books. 
+   * *Example:* If you are submitting a `javascript_basics.md` roadmap, its structure should be heavily inspired by the index of *Eloquent JavaScript*, *You Don't Know JS*, or a fusion of both.
+2. **Quality over Quantity:** We aim to provide university-grade or masterclass-grade structures. Cite your book inspirations in a comment at the top of the markdown file.
+3. **Format:** Must be strictly Checkboxes (`[ ]`) and hierarchical lists. No theoretical explanations.
