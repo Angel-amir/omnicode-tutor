@@ -17,6 +17,7 @@ Read the user's `STUDENT_PROFILE.md` to determine their "Topic of Study".
 **Crucial Format Rule:**
 The roadmap MUST be a markdown file containing ONLY high-level topics and checkboxes. Do NOT include theoretical explanations.
 Example format:
+
 ```markdown
 # Roadmap: [Topic]
 - [ ] 1. Basic Concepts

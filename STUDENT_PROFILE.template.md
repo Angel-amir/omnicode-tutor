@@ -1,4 +1,4 @@
-## Technical Profile
+# Technical Profile
 - **Topic of Study:** [e.g., Python, React, Cybersecurity]
 - **Domain of Interest:** [e.g., Medicine, Finance, Video Games]
 - **Current Level:** [Beginner / Intermediate / Advanced]
