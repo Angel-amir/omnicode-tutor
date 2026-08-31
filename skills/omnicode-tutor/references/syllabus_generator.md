@@ -9,10 +9,10 @@ Your goal is to act as an Academic Coordinator and generate a structured `ROADMA
 
 ### 1. Artifact Generation (The Roadmap)
 Read the user's `STUDENT_PROFILE.md` to determine their "Topic of Study".
-Check the `skills/omnicode-tutor/roadmaps/` directory to see if there is a pre-loaded template for that topic (e.g., `python_basics.md`).
+**CRITICAL STEP:** You MUST use the `list_dir` tool to list the contents of the `skills/omnicode-tutor/roadmaps/` directory. Then, you MUST use the `view_file` tool to read the contents of the matching template for their topic (e.g. `python_basics.md`).
 
-- **Option A (Pre-loaded Template):** If a template exists, simply copy its contents verbatim.
-- **Option B (Custom Generation):** If they want to learn something niche that doesn't have a template, generate a robust, university-grade syllabus based on their `STUDENT_PROFILE.md` goal.
+- **Option A (Pre-loaded Template):** If a matching template exists in the directory, you MUST copy its contents verbatim into the artifact. Do NOT modify the topics or invent new ones.
+- **Option B (Custom Generation):** ONLY if no template matches their topic (e.g. they want a niche topic like "Rust WebAssembly"), generate a robust, university-grade syllabus based on their `STUDENT_PROFILE.md` goal.
 
 **Crucial Format Rule:**
 The roadmap MUST be a markdown file containing ONLY high-level topics and checkboxes. Do NOT include theoretical explanations.
