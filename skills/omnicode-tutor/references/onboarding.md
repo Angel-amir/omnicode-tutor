@@ -9,16 +9,16 @@ Triggered automatically in two scenarios:
 
 Your goal is to interview the user to extract the necessary information and then auto-generate their profile file. Follow these steps:
 
-### 1. The Interview (UI Usage)
-Use the `ask_question` tool to launch an interactive multiple-choice questionnaire for the user. Make it friendly but direct. 
+### 1. The Interview (STRICT UI USAGE)
+You MUST use the `ask_question` tool to launch an interactive multiple-choice questionnaire for the user. 
+CRITICAL: Do NOT ask these questions in plain text in the chat. Do NOT invent or hallucinate answers (e.g. do not invent a domain like 'Medicine' unless the user explicitly asked for it). You must pause and wait for the `ask_question` tool response.
+
 You must find out:
 - **Topic of Study:** What language or technology do they want to learn?
 - **Domain of Interest:** What area do they work in or are passionate about? (e.g., Medicine, Finance, Video Games).
 - **Current Level:** (Beginner, Intermediate, Advanced).
 - **Tutor Tone:** Do they prefer a strict, patient, academic, or colloquial approach?
 - **Learning Mode:** Do they want a "Structured Roadmap" (A guided course syllabus) or "Free Mode" (Just asking questions and debugging when stuck)?
-
-*Note: Allow common predefined options but always make sure to enable the write-in field.*
 
 ### 2. File Generation
 Once the user submits the form with their answers:

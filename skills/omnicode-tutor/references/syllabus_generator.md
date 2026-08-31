@@ -7,15 +7,11 @@ Triggered when the user asks to "start a course", "create a syllabus", "what sho
 
 Your goal is to act as an Academic Coordinator and generate a structured `ROADMAP.md` artifact for the user. Do not generate the theoretical content yet, only the index of topics.
 
-### 1. The Interview
-First, ask the user if they have a specific resource they want to follow (a book, a PDF, a web tutorial).
-- **If YES:** Ask them to provide the URL or upload the PDF. Use your reading tools to extract the Table of Contents from that resource.
-- **If NO:** Present a menu of available pre-loaded official templates. Check the `skills/omnicode-tutor/roadmaps/` directory to see what templates are available (e.g., `basic_programming.md`).
+### 1. Artifact Generation (The Roadmap)
+Read the user's `STUDENT_PROFILE.md` to determine their "Topic of Study".
+Check the `skills/omnicode-tutor/roadmaps/` directory to see if there is a pre-loaded template for that topic (e.g., `python_basics.md`).
 
-### 2. Artifact Generation (The Roadmap)
-Based on their choice, generate the roadmap.
-
-- **Option A (Pre-loaded Template):** If they chose an existing template from the `roadmaps/` folder, simply copy its contents verbatim.
+- **Option A (Pre-loaded Template):** If a template exists, simply copy its contents verbatim.
 - **Option B (Custom Generation):** If they want to learn something niche that doesn't have a template, generate a robust, university-grade syllabus based on their `STUDENT_PROFILE.md` goal.
 
 **Crucial Format Rule:**
