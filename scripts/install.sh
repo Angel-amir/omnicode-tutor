@@ -14,9 +14,15 @@ echo "🎓 Starting pure installation of Omnicode Tutor..."
 # 1. Ensure the skills folder exists
 mkdir -p "$SKILL_DEST"
 
-# 2. Download and extract ONLY the skill folder
-echo "📥 Downloading skill files (ignoring the rest of the repository)..."
-curl -sSL "$TARBALL_URL" | tar -xz --strip-components=3 -C "$SKILL_DEST" --wildcards "*/skills/omnicode-tutor"
+# 2. Download and extract safely (Cross-platform for Linux and macOS/bsdtar)
+echo "📥 Downloading skill files..."
+TMP_DIR=$(mktemp -d)
+curl -sSL "$TARBALL_URL" | tar -xz -C "$TMP_DIR"
+REPO_DIR=$(find "$TMP_DIR" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+
+# Move the specific skill folder content
+cp -R "$REPO_DIR/skills/omnicode-tutor/"* "$SKILL_DEST/"
+rm -rf "$TMP_DIR"
 
 echo ""
 echo "🧩 Checking required dependencies..."
@@ -24,7 +30,11 @@ DIAGRAM_DEST="$SKILLS_DIR/diagram-design"
 if [ ! -d "$DIAGRAM_DEST" ]; then
     echo "📥 Installing required dependency: diagram-design..."
     mkdir -p "$DIAGRAM_DEST"
-    curl -sSL "https://github.com/cathrynlavery/diagram-design/tarball/main" | tar -xz --strip-components=3 -C "$DIAGRAM_DEST" --wildcards "*/skills/diagram-design"
+    TMP_DIAGRAM=$(mktemp -d)
+    curl -sSL "https://github.com/cathrynlavery/diagram-design/tarball/main" | tar -xz -C "$TMP_DIAGRAM"
+    DIAGRAM_REPO_DIR=$(find "$TMP_DIAGRAM" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+    cp -R "$DIAGRAM_REPO_DIR/skills/diagram-design/"* "$DIAGRAM_DEST/"
+    rm -rf "$TMP_DIAGRAM"
 else
     echo "✅ diagram-design is already installed."
 fi
