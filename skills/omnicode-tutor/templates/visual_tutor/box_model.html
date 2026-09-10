@@ -1,275 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Omnicode Tutor - Memory Box Model</title>
-<style>
-  :root {
-    --bg-color: #f9f9fb;
-    --card-bg: #ffffff;
-    --text-primary: #1a1a2e;
-    --text-secondary: #6b7280;
-    --border-color: #e5e7eb;
-    --accent-blue: #3b82f6;
-    --accent-green: #10b981;
-    --accent-purple: #8b5cf6;
-    --font-mono: 'Courier New', Courier, monospace;
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  
-  body {
-    font-family: var(--font-sans);
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    padding: 20px;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .header {
-    text-align: center;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 15px;
-  }
-
-  .explanation-panel {
-    background: var(--card-bg);
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid var(--accent-blue);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    font-size: 15px;
-  }
-
-  .code-line {
-    font-family: var(--font-mono);
-    background: #1e1e1e;
-    color: #d4d4d4;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    margin-bottom: 10px;
-    display: inline-block;
-  }
-
-  .memory-container {
-    display: flex;
-    gap: 40px;
-    position: relative;
-    justify-content: center;
-    align-items: flex-start;
-  }
-
-  .memory-zone {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 20px;
-    min-width: 250px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  }
-
-  .zone-title {
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 13px;
-    letter-spacing: 1px;
-    color: var(--text-secondary);
-  }
-
-  .box {
-    border: 2px solid var(--border-color);
-    border-radius: 6px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    transition: all 0.3s ease;
-  }
-  
-  .box.changed {
-    border-color: var(--accent-green);
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-  }
-
-  .box-header {
-    background: #f3f4f6;
-    padding: 5px 10px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border-color);
-    border-radius: 4px 4px 0 0;
-  }
-
-  .box-name {
-    font-weight: bold;
-    color: var(--accent-blue);
-  }
-
-  .box-address {
-    color: var(--text-secondary);
-  }
-
-  .box-value {
-    padding: 15px;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 16px;
-    word-break: break-all;
-  }
-
-  /* SVG layer for arrows */
-  #arrow-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  .controls {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-  }
-
-  button {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 8px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-  }
-
-  button:hover:not(:disabled) {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-  }
-  
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  button.primary {
-    background: var(--accent-blue);
-    color: white;
-    border: none;
-  }
-
-  button.primary:hover:not(:disabled) {
-    background: #2563eb;
-  }
-
-  .step-counter {
-    font-family: var(--font-mono);
-    font-size: 14px;
-    align-self: center;
-    color: var(--text-secondary);
-  }
-</style>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    /* Ensure the SVG layer is absolutely positioned over the memory panels */
+    #arrow-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+    }
+  </style>
 </head>
-<body>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2">
 
-  <div class="header">
-    <h2 style="margin:0;">Visual Tutor: The Box Model</h2>
-    <p style="margin:5px 0 0 0; color:var(--text-secondary); font-size:14px;">Variables, Pointers & Memory</p>
-  </div>
-
-  <div class="explanation-panel">
-    <div class="code-line" id="code-display">Loading...</div>
-    <div id="explanation-display">Initial state</div>
-  </div>
-
-  <div class="memory-container" id="memory-container">
-    <svg id="arrow-svg"></svg>
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-xl p-4 shadow-sm flex flex-col gap-4 relative">
     
-    <div class="memory-zone" id="stack-zone">
-      <h3 class="zone-title">Stack (Variables)</h3>
-      <div id="stack-boxes"></div>
+    <!-- Header -->
+    <div class="flex justify-between items-end">
+      <div>
+        <h2 class="font-semibold text-lg flex items-center gap-2">📦 The Box Model: Memory & Pointers</h2>
+        <p class="text-[var(--muted-foreground)] text-sm">Visualizing Stack vs Heap allocations.</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="btn-prev" disabled class="px-3 py-1 bg-[var(--background)] border border-[var(--border)] rounded-md text-sm hover:bg-[var(--muted)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">Prev</button>
+        <button id="btn-next" class="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">Next</button>
+      </div>
     </div>
 
-    <div class="memory-zone" id="heap-zone">
-      <h3 class="zone-title">Heap (Dynamic Memory)</h3>
-      <div id="heap-boxes"></div>
-    </div>
-  </div>
+    <!-- Main Content Grid -->
+    <div class="flex flex-row gap-4 relative min-h-[250px]">
+      
+      <!-- Code Panel -->
+      <div class="w-1/3 flex flex-col gap-2">
+        <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider">Source Code</h3>
+        <div id="code-block" class="bg-[var(--background)] rounded-md border border-[var(--border)] py-2 font-mono text-xs overflow-x-auto flex-grow">
+          <!-- Code injected here -->
+        </div>
+      </div>
 
-  <div class="controls">
-    <button id="btn-prev" disabled>← Previous</button>
-    <span class="step-counter" id="step-counter">Step 0 / 0</span>
-    <button id="btn-next" class="primary">Next →</button>
+      <!-- RAM Panel (Stack & Heap) -->
+      <div class="w-2/3 flex gap-4 relative" id="memory-container">
+        <!-- SVG Layer for pointer arrows -->
+        <svg id="arrow-svg"></svg>
+
+        <!-- STACK -->
+        <div class="w-1/2 flex flex-col gap-2">
+          <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider text-center">Stack (Variables)</h3>
+          <div id="stack-boxes" class="bg-[var(--background)] border border-[var(--border)] rounded-md p-3 flex flex-col gap-3 min-h-[200px]">
+            <!-- Stack boxes injected here -->
+          </div>
+        </div>
+
+        <!-- HEAP -->
+        <div class="w-1/2 flex flex-col gap-2">
+          <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider text-center">Heap (Objects)</h3>
+          <div id="heap-boxes" class="bg-[var(--background)] border border-[var(--border)] rounded-md p-3 flex flex-col gap-3 min-h-[200px]">
+            <!-- Heap boxes injected here -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Explanation Panel -->
+    <div class="bg-blue-500/10 border-l-4 border-blue-500 p-3 rounded-r-md mt-2">
+      <p class="text-sm" id="explanation-display">Loading execution steps...</p>
+    </div>
+
   </div>
 
 <script>
-/**
- * -------------------------------------------------------------
+/** -------------------------------------------------------------
  * OMNICODE TUTOR CONTRACT AREA
- * LLM INSTRUCTION: Do NOT change the HTML/CSS above. 
- * ONLY inject the execution steps into the `execution_steps` array below.
- * -------------------------------------------------------------
- */
-const execution_steps = [
-  // Example data (LLM will replace this array with the real code steps)
-  {
-    step: 1,
-    code: "let x = 10;",
-    explanation: "A primitive variable 'x' is created in the Stack with the value 10.",
-    stack: [ { id: "var_x", name: "x", address: "0x100", value: "10" } ],
-    heap: []
-  },
-  {
-    step: 2,
-    code: "let obj = { val: 5 };",
-    explanation: "An object is created in the Heap. The variable 'obj' in the Stack holds a REFERENCE (pointer) to that Heap address.",
-    stack: [ 
-      { id: "var_x", name: "x", address: "0x100", value: "10" },
-      { id: "var_obj", name: "obj", address: "0x104", value: "0x2A4", points_to: "heap_obj1" } 
-    ],
-    heap: [
-      { id: "heap_obj1", address: "0x2A4", value: "{ val: 5 }" }
-    ]
-  }
-];
+ * ------------------------------------------------------------- */
+const execution_data = {
+  code: "list_a = [1, 2, 3]\nlist_b = list_a\nlist_b.append(4)",
+  steps: [
+    {
+      line: 1,
+      explanation: "Python creates the list in the HEAP. The variable 'list_a' in the STACK merely stores a POINTER to that memory address.",
+      stack: [ { id: "var_a", name: "list_a", address: "0x100", value: "0x800", points_to: "heap_list" } ],
+      heap: [ { id: "heap_list", address: "0x800", value: "[1, 2, 3]" } ]
+    },
+    {
+      line: 2,
+      explanation: "You are copying the POINTER, not the list. Now 'list_b' points to the EXACT SAME physical memory address (0x800).",
+      stack: [ 
+        { id: "var_a", name: "list_a", address: "0x100", value: "0x800", points_to: "heap_list" },
+        { id: "var_b", name: "list_b", address: "0x104", value: "0x800", points_to: "heap_list", changed: true } 
+      ],
+      heap: [ { id: "heap_list", address: "0x800", value: "[1, 2, 3]" } ]
+    },
+    {
+      line: 3,
+      explanation: "You mutated the object at 0x800. Since BOTH variables point there, modifying list_b also affects list_a!",
+      stack: [ 
+        { id: "var_a", name: "list_a", address: "0x100", value: "0x800", points_to: "heap_list" },
+        { id: "var_b", name: "list_b", address: "0x104", value: "0x800", points_to: "heap_list" } 
+      ],
+      heap: [ { id: "heap_list", address: "0x800", value: "[1, 2, 3, 4]", changed: true } ]
+    }
+  ]
+};
 /** ------------------------------------------------------------- */
 
 let currentStepIndex = 0;
 
-function drawBox(boxData, type) {
-  const highlightClass = boxData.changed ? 'changed' : '';
-  return '<div class="box ' + highlightClass + '" id="' + boxData.id + '">' +
-           '<div class="box-header">' +
-             '<span class="box-name">' + (boxData.name || 'Memory') + '</span>' +
-             '<span class="box-address">' + boxData.address + '</span>' +
+function renderCode(activeLine) {
+  const codeLines = execution_data.code.split('\\n');
+  const codeHtml = codeLines.map(function(line, index) {
+    const lineNum = index + 1;
+    const isActive = lineNum === activeLine;
+    const bgClass = isActive ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400 border-l-2 border-blue-500 font-bold' : 'text-[var(--foreground)] border-l-2 border-transparent';
+    const arrow = isActive ? '<span class="float-right animate-pulse">⬅️</span>' : '';
+    
+    return '<div class="px-2 py-0.5 flex justify-between ' + bgClass + '">' +
+             '<span><span class="text-[var(--muted-foreground)] mr-2 select-none">' + lineNum + '</span>' + line + '</span>' +
+             arrow +
+           '</div>';
+  }).join('');
+  document.getElementById('code-block').innerHTML = codeHtml;
+}
+
+function drawBox(boxData) {
+  const borderClass = boxData.changed ? 'border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] scale-[1.02]' : 'border-[var(--border)]';
+  return '<div id="' + boxData.id + '" class="bg-[var(--card)] border ' + borderClass + ' rounded flex justify-between items-center p-2 text-xs transition-all duration-300">' +
+           '<div class="flex flex-col">' +
+             '<span class="font-mono text-blue-600 dark:text-blue-400 font-bold">' + (boxData.name || 'Memory') + '</span>' +
+             '<span class="text-[8px] text-[var(--muted-foreground)] uppercase">' + boxData.address + '</span>' +
            '</div>' +
-           '<div class="box-value">' + boxData.value + '</div>' +
+           '<span class="font-mono bg-[var(--background)] px-2 py-1 rounded">' + boxData.value + '</span>' +
          '</div>';
 }
 
 function renderStep(index) {
-  const step = execution_steps[index];
-  document.getElementById('code-display').innerText = step.code;
+  const step = execution_data.steps[index];
+  
+  // 1. Render Code & Explanation
+  renderCode(step.line);
   document.getElementById('explanation-display').innerText = step.explanation;
-  document.getElementById('step-counter').innerText = "Step " + (index + 1) + " / " + execution_steps.length;
 
-  const stackHtml = step.stack.map(function(b) { return drawBox(b, 'stack'); }).join('');
-  const heapHtml = step.heap.map(function(b) { return drawBox(b, 'heap'); }).join('');
+  // 2. Render Memory Boxes
+  const stackHtml = step.stack.map(drawBox).join('');
+  const heapHtml = step.heap.map(drawBox).join('');
 
-  document.getElementById('stack-boxes').innerHTML = stackHtml || '<div style="color:#aaa; text-align:center; font-size:12px;">(Empty)</div>';
-  document.getElementById('heap-boxes').innerHTML = heapHtml || '<div style="color:#aaa; text-align:center; font-size:12px;">(Empty)</div>';
+  document.getElementById('stack-boxes').innerHTML = stackHtml || '<div class="text-center text-[var(--muted-foreground)] text-xs italic mt-4">(Empty)</div>';
+  document.getElementById('heap-boxes').innerHTML = heapHtml || '<div class="text-center text-[var(--muted-foreground)] text-xs italic mt-4">(Empty)</div>';
 
   drawPointers(step);
   updateButtons();
@@ -277,13 +158,11 @@ function renderStep(index) {
 
 function drawPointers(step) {
   const svg = document.getElementById('arrow-svg');
-  svg.innerHTML = ''; // Clear old arrows
+  svg.innerHTML = ''; 
 
-  // Add arrow marker def
-  const defs = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-purple)"/></marker></defs>';
+  const defs = '<defs><marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#3b82f6"/></marker></defs>';
   svg.innerHTML += defs;
 
-  // We need a tiny timeout so the DOM has time to render the new boxes before we measure them
   setTimeout(function() {
     step.stack.forEach(function(variable) {
       if (variable.points_to) {
@@ -295,18 +174,16 @@ function drawPointers(step) {
           const sRect = sourceBox.getBoundingClientRect();
           const tRect = targetBox.getBoundingClientRect();
 
-          // Calculate center points relative to the SVG container
           const startX = sRect.right - containerRect.left;
           const startY = sRect.top + (sRect.height / 2) - containerRect.top;
-          const endX = tRect.left - containerRect.left - 5; // -5 to leave room for arrowhead
+          const endX = tRect.left - containerRect.left - 5; 
           const endY = tRect.top + (tRect.height / 2) - containerRect.top;
 
-          // Create curved SVG path
           const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          const d = "M " + startX + " " + startY + " C " + (startX + 50) + " " + startY + ", " + (endX - 50) + " " + endY + ", " + endX + " " + endY;
+          const d = "M " + startX + " " + startY + " C " + (startX + 30) + " " + startY + ", " + (endX - 30) + " " + endY + ", " + endX + " " + endY;
           
           path.setAttribute("d", d);
-          path.setAttribute("stroke", "var(--accent-purple)");
+          path.setAttribute("stroke", "#3b82f6");
           path.setAttribute("stroke-width", "2");
           path.setAttribute("fill", "transparent");
           path.setAttribute("marker-end", "url(#arrowhead)");
@@ -319,26 +196,25 @@ function drawPointers(step) {
 
 function updateButtons() {
   document.getElementById('btn-prev').disabled = currentStepIndex === 0;
-  document.getElementById('btn-next').disabled = currentStepIndex === execution_steps.length - 1;
+  document.getElementById('btn-next').disabled = currentStepIndex === execution_data.steps.length - 1;
 }
 
-document.getElementById('btn-next').addEventListener('click', () => {
-  if (currentStepIndex < execution_steps.length - 1) {
+document.getElementById('btn-next').addEventListener('click', function() {
+  if (currentStepIndex < execution_data.steps.length - 1) {
     currentStepIndex++;
     renderStep(currentStepIndex);
   }
 });
 
-document.getElementById('btn-prev').addEventListener('click', () => {
+document.getElementById('btn-prev').addEventListener('click', function() {
   if (currentStepIndex > 0) {
     currentStepIndex--;
     renderStep(currentStepIndex);
   }
 });
 
-// Init
-window.onload = () => {
-  if (execution_steps && execution_steps.length > 0) {
+window.onload = function() {
+  if (execution_data && execution_data.steps.length > 0) {
     renderStep(0);
   }
 };
