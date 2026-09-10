@@ -249,25 +249,24 @@ const execution_steps = [
 let currentStepIndex = 0;
 
 function drawBox(boxData, type) {
-  return `
-    <div class="box" id="${boxData.id}">
-      <div class="box-header">
-        <span class="box-name">${boxData.name || 'Memory'}</span>
-        <span class="box-address">${boxData.address}</span>
-      </div>
-      <div class="box-value">${boxData.value}</div>
-    </div>
-  `;
+  const highlightClass = boxData.changed ? 'changed' : '';
+  return '<div class="box ' + highlightClass + '" id="' + boxData.id + '">' +
+           '<div class="box-header">' +
+             '<span class="box-name">' + (boxData.name || 'Memory') + '</span>' +
+             '<span class="box-address">' + boxData.address + '</span>' +
+           '</div>' +
+           '<div class="box-value">' + boxData.value + '</div>' +
+         '</div>';
 }
 
 function renderStep(index) {
   const step = execution_steps[index];
   document.getElementById('code-display').innerText = step.code;
   document.getElementById('explanation-display').innerText = step.explanation;
-  document.getElementById('step-counter').innerText = `Step ${index + 1} / ${execution_steps.length}`;
+  document.getElementById('step-counter').innerText = "Step " + (index + 1) + " / " + execution_steps.length;
 
-  const stackHtml = step.stack.map(b => drawBox(b, 'stack')).join('');
-  const heapHtml = step.heap.map(b => drawBox(b, 'heap')).join('');
+  const stackHtml = step.stack.map(function(b) { return drawBox(b, 'stack'); }).join('');
+  const heapHtml = step.heap.map(function(b) { return drawBox(b, 'heap'); }).join('');
 
   document.getElementById('stack-boxes').innerHTML = stackHtml || '<div style="color:#aaa; text-align:center; font-size:12px;">(Empty)</div>';
   document.getElementById('heap-boxes').innerHTML = heapHtml || '<div style="color:#aaa; text-align:center; font-size:12px;">(Empty)</div>';
@@ -281,12 +280,12 @@ function drawPointers(step) {
   svg.innerHTML = ''; // Clear old arrows
 
   // Add arrow marker def
-  const defs = `<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-purple)"/></marker></defs>`;
+  const defs = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--accent-purple)"/></marker></defs>';
   svg.innerHTML += defs;
 
   // We need a tiny timeout so the DOM has time to render the new boxes before we measure them
-  setTimeout(() => {
-    step.stack.forEach(variable => {
+  setTimeout(function() {
+    step.stack.forEach(function(variable) {
       if (variable.points_to) {
         const sourceBox = document.getElementById(variable.id);
         const targetBox = document.getElementById(variable.points_to);
@@ -304,7 +303,7 @@ function drawPointers(step) {
 
           // Create curved SVG path
           const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          const d = \`M \${startX} \${startY} C \${startX + 50} \${startY}, \${endX - 50} \${endY}, \${endX} \${endY}\`;
+          const d = "M " + startX + " " + startY + " C " + (startX + 50) + " " + startY + ", " + (endX - 50) + " " + endY + ", " + endX + " " + endY;
           
           path.setAttribute("d", d);
           path.setAttribute("stroke", "var(--accent-purple)");
