@@ -7,10 +7,17 @@
     .dim-path { stroke: #334155; stroke-width: 3; transition: all 0.5s; }
     .glow-path-cyan { stroke: #06b6d4; stroke-width: 5; filter: drop-shadow(0 0 5px #06b6d4); transition: all 0.5s; }
     .glow-path-rose { stroke: #f43f5e; stroke-width: 5; filter: drop-shadow(0 0 5px #f43f5e); transition: all 0.5s; }
+    .glow-path-emerald { stroke: #10b981; stroke-width: 5; filter: drop-shadow(0 0 5px #10b981); transition: all 0.5s; }
     .node-dim { opacity: 0.3; filter: grayscale(100%); }
     .node-active { opacity: 1; transform: scale(1.05); box-shadow: 0 0 15px rgba(255, 255, 255, 0.15); border-color: #94a3b8 !important; }
-    #execution-ball { transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .dock { width: 3rem; height: 3rem; border-radius: 9999px; border: 2px dashed rgba(255,255,255,0.3); background: rgba(0,0,0,0.3); box-sizing: border-box; }
+    
+    .dock { width: 3rem; height: 3rem; border-radius: 9999px; border: 2px dashed rgba(255,255,255,0.3); background: rgba(0,0,0,0.3); box-sizing: border-box; flex-shrink: 0; }
+    
+    #viewport { width: 100%; height: 100%; overflow: hidden; position: relative; }
+    #camera-slider { display: flex; height: 100%; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1); }
+    .scene { height: 100%; position: relative; flex-shrink: 0; }
+    
+    .execution-ball { transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
   </style>
 </head>
 <body class="bg-transparent text-[var(--foreground)] antialiased p-2">
@@ -18,8 +25,8 @@
     
     <div class="flex justify-between items-end">
       <div>
-        <h2 class="font-semibold text-lg flex items-center gap-2">🧩 The Puzzle Flow V5 (Fixed Math)</h2>
-        <p class="text-[var(--muted-foreground)] text-sm">Pixel-perfect docking using precise border-box offsets.</p>
+        <h2 class="font-semibold text-lg flex items-center gap-2">🎬 Puzzle Flow: Extreme Panning</h2>
+        <p class="text-[var(--muted-foreground)] text-sm">score = 55. Evaluating through 4 different scenes to hit the 'else' block.</p>
       </div>
       <div class="flex gap-2">
         <button id="btn-prev" disabled class="px-3 py-1 bg-[var(--background)] border border-[var(--border)] rounded-md text-sm transition-colors">Prev</button>
@@ -32,196 +39,234 @@
       <!-- Code Panel -->
       <div class="w-1/3 flex flex-col gap-2">
         <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider">Python Code</h3>
-        <div id="code-block" class="bg-[var(--background)] rounded-md border border-[var(--border)] py-2 font-mono text-xs overflow-x-auto flex-grow">
-          <div class="px-2 py-1 transition-colors border-l-4 border-transparent" id="code-1">1  age = 15</div>
-          <div class="px-2 py-1 transition-colors border-l-4 border-transparent" id="code-2">2  if age >= 18:</div>
-          <div class="px-2 py-1 transition-colors border-l-4 border-transparent pl-6" id="code-3">3    print('Adult')</div>
-          <div class="px-2 py-1 transition-colors border-l-4 border-transparent" id="code-4">4  else:</div>
-          <div class="px-2 py-1 transition-colors border-l-4 border-transparent pl-6" id="code-5">5    print('Minor')</div>
-          <div class="px-2 py-1 transition-colors border-l-4 border-transparent" id="code-6">6  print('Done')</div>
-        </div>
+        <div id="code-block" class="bg-[var(--background)] rounded-md border border-[var(--border)] py-2 font-mono text-xs overflow-y-auto flex-grow"></div>
       </div>
 
-      <!-- Logic Map Panel -->
-      <div class="w-2/3 relative bg-slate-900 rounded-lg overflow-hidden border-4 border-slate-800 shadow-inner" id="map-container">
-        
-        <!-- SVG Paths -->
-        <svg class="absolute inset-0 w-full h-full pointer-events-none" id="flow-svg">
-          <path id="path-1" d="M 250 10 L 250 50" class="dim-path" fill="none"/>
-          <path id="path-2" d="M 250 110 L 250 150" class="dim-path" fill="none"/>
-          <path id="path-3-true" d="M 250 230 L 120 280" class="dim-path" fill="none"/>
-          <path id="path-3-false" d="M 250 230 L 380 280" class="dim-path" fill="none"/>
-          <path id="path-4-true" d="M 120 340 L 250 400" class="dim-path" fill="none"/>
-          <path id="path-4-false" d="M 380 340 L 250 400" class="dim-path" fill="none"/>
-        </svg>
-
-        <!-- Nodes Layer -->
-        <div class="absolute inset-0 z-20">
-          
-          <!-- Start Track Point -->
-          <div id="slot-start" class="absolute top-[5px] left-[250px] w-12 h-12 -translate-x-1/2 opacity-0"></div>
-
-          <!-- Assignment Node -->
-          <div id="node-assign" class="absolute top-[50px] left-[175px] w-[150px] h-[60px] bg-slate-800 border-2 border-slate-600 rounded-lg flex items-center justify-center transition-all duration-300 gap-2">
-            <span class="font-mono font-bold text-slate-300 text-sm">age =</span>
-            <!-- DOCK 1 -->
-            <div id="slot-pickup" class="dock border-cyan-500/50"></div>
-          </div>
-          
-          <!-- Condition Node -->
-          <div id="node-cond" class="absolute top-[150px] left-[125px] w-[250px] h-[80px] bg-slate-800/80 border-2 border-slate-500 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
-            <span class="text-[9px] uppercase text-slate-400 font-bold mb-1 tracking-widest absolute top-1">Condition</span>
-            <div class="flex items-center gap-2 mt-2">
-              <span class="font-mono text-slate-400 text-sm">if</span>
-              <!-- DOCK 2 -->
-              <div id="slot-hole" class="dock border-yellow-500/50"></div>
-              <span class="font-mono font-bold text-yellow-300 text-lg">>= 18:</span>
-            </div>
-          </div>
-
-          <!-- True Branch -->
-          <div id="node-true" class="absolute top-[280px] left-[45px] w-[150px] h-[60px] bg-slate-800 border-2 border-emerald-500 rounded-md flex flex-col items-center justify-center transition-all duration-300">
-            <span class="font-mono font-bold text-emerald-400 text-sm">print('Adult')</span>
-          </div>
-
-          <!-- False Branch -->
-          <div id="node-false" class="absolute top-[280px] left-[305px] w-[150px] h-[60px] bg-slate-800 border-2 border-rose-500 rounded-md flex flex-col items-center justify-center transition-all duration-300">
-            <span class="font-mono font-bold text-rose-400 text-sm">print('Minor')</span>
-          </div>
-
-          <!-- End Node -->
-          <div id="node-end" class="absolute top-[400px] left-[180px] w-[140px] h-[40px] bg-slate-800 border-2 border-slate-600 rounded-full flex flex-col items-center justify-center transition-all duration-300">
-             <span class="font-mono font-bold text-slate-400 text-xs">print('Done')</span>
-          </div>
+      <!-- Logic Map Panel (Viewport) -->
+      <div class="w-2/3 bg-slate-900 rounded-lg border-4 border-slate-800 shadow-inner" id="viewport">
+        <div id="camera-slider" style="transform: translateX(0%);">
+           <!-- Scenes Injected Here -->
         </div>
-
-        <!-- The Execution Ball -->
-        <div id="execution-ball" class="absolute w-12 h-12 bg-slate-400 border-[3px] border-white rounded-full z-30 flex items-center justify-center text-slate-900 font-black font-mono text-sm m-0 p-0 box-border" style="top: -100px; left: -100px;">
-          <span id="ball-val"></span>
-        </div>
-
       </div>
     </div>
 
-    <!-- Explanation -->
-    <div class="bg-cyan-500/10 border-l-4 border-cyan-500 p-3 rounded-r-md mt-2">
+    <div class="bg-purple-500/10 border-l-4 border-purple-500 p-3 rounded-r-md mt-2">
       <p class="text-sm" id="explanation-display">Loading...</p>
     </div>
 
   </div>
 
 <script>
-const steps = [
-  { 
-    code: 1, exp: "Line 1: Execution begins. The value '15' is assigned to 'age'.", 
-    targetSlot: "slot-pickup", ballTxt: "15", ballColor: "bg-cyan-400", shadow: "#22d3ee", ballVisible: true,
-    nodeOn: "node-assign", pathOn: ["path-1"], pathColor: "glow-path-cyan"
-  },
-  { 
-    code: 2, exp: "Line 2: The execution thread evaluates the condition. It substitutes the value '15' into the variable slot.", 
-    targetSlot: "slot-hole", ballTxt: "15", ballColor: "bg-cyan-400", shadow: "#22d3ee", ballVisible: true,
-    nodeOn: "node-cond", pathOn: ["path-1", "path-2"], pathColor: "glow-path-cyan"
-  },
-  { 
-    code: 2, exp: "The equation is [15] >= 18. Python evaluates it... FALSE! The value transforms into a Boolean result.", 
-    targetSlot: "slot-hole", ballTxt: "False", ballColor: "bg-rose-500 text-white", shadow: "#f43f5e", textScale: "text-[10px]", ballVisible: true,
-    nodeOn: "node-cond", pathOn: ["path-1", "path-2"], pathColor: "glow-path-cyan"
-  },
-  { 
-    code: 5, exp: "Because it evaluated to False, the boolean ball dissolves, and the execution energy is routed down the False track to the Else block.", 
-    targetSlot: "slot-hole", ballTxt: "False", ballColor: "bg-rose-500", shadow: "transparent", ballVisible: false,
-    nodeOn: "node-false", dimNode: "node-true", pathOn: ["path-1", "path-2", "path-3-false"], pathColor: "glow-path-rose"
-  },
-  { 
-    code: 6, exp: "The if/else statement finishes. The execution merges back and runs the final print.", 
-    targetSlot: "slot-hole", ballTxt: "", ballColor: "bg-slate-400", shadow: "transparent", ballVisible: false,
-    nodeOn: "node-end", dimNode: "node-true", pathOn: ["path-1", "path-2", "path-3-false", "path-4-false"], pathColor: "glow-path-rose"
-  }
-];
+// JSON PAYLOAD - score = 55
+const execution_data = {
+  c: "score = 55\nif score >= 90:\n  print('A')\nelif score >= 80:\n  print('B')\nelif score >= 70:\n  print('C')\nelif score >= 60:\n  print('D')\nelse:\n  print('F')",
+  sc: [
+    { id: 1, k: "if", c: ">= 90:", t: "print('A')", f: "elif ➡️" },
+    { id: 2, k: "elif", c: ">= 80:", t: "print('B')", f: "elif ➡️" },
+    { id: 3, k: "elif", c: ">= 70:", t: "print('C')", f: "elif ➡️" },
+    { id: 4, k: "elif", c: ">= 60:", t: "print('D')", f: "else: print('F')" }
+  ],
+  st: [
+    { c: 1, e: "Ejecución inicia. Asignamos 55 a 'score'.", cam: 0, b: 1, s: "s1-dock-assign", v: "55", col: "bg-cyan-400 scale-100", on: "s1-node-assign", p: ["s1-p1"], pc: "glow-path-cyan" },
+    { c: 2, e: "ESCENA 1: ¿[55] >= 90? FALSO.", cam: 0, b: 1, s: "s1-dock-hole", v: "False", col: "bg-rose-500 text-white scale-100", on: "s1-node-cond", p: ["s1-p1","s1-p2"], pc: "glow-path-cyan" },
+    { c: 2, e: "Es falso, así que avanzamos al siguiente portal.", cam: 0, b: 1, s: "s1-dock-portal", v: "False", col: "bg-rose-500 scale-100", on: "s1-node-false", dim: "s1-node-true", p: ["s1-p1","s1-p2","s1-p4"], pc: "glow-path-rose" },
+    
+    { c: 4, e: "PANEO 1: Pasamos al primer elif.", cam: 1, b: 2, s: "s2-dock-assign", v: "55", col: "bg-cyan-400 scale-100", on: "s2-node-assign", p: ["s2-p1"], pc: "glow-path-cyan" },
+    { c: 4, e: "ESCENA 2: ¿[55] >= 80? FALSO.", cam: 1, b: 2, s: "s2-dock-hole", v: "False", col: "bg-rose-500 text-white scale-100", on: "s2-node-cond", p: ["s2-p1","s2-p2"], pc: "glow-path-cyan" },
+    { c: 4, e: "Es falso, continuamos el viaje...", cam: 1, b: 2, s: "s2-dock-portal", v: "False", col: "bg-rose-500 scale-100", on: "s2-node-false", dim: "s2-node-true", p: ["s2-p1","s2-p2","s2-p4"], pc: "glow-path-rose" },
+
+    { c: 6, e: "PANEO 2: Pasamos al segundo elif.", cam: 2, b: 3, s: "s3-dock-assign", v: "55", col: "bg-cyan-400 scale-100", on: "s3-node-assign", p: ["s3-p1"], pc: "glow-path-cyan" },
+    { c: 6, e: "ESCENA 3: ¿[55] >= 70? FALSO.", cam: 2, b: 3, s: "s3-dock-hole", v: "False", col: "bg-rose-500 text-white scale-100", on: "s3-node-cond", p: ["s3-p1","s3-p2"], pc: "glow-path-cyan" },
+    { c: 6, e: "Tampoco sacó C. Seguimos...", cam: 2, b: 3, s: "s3-dock-portal", v: "False", col: "bg-rose-500 scale-100", on: "s3-node-false", dim: "s3-node-true", p: ["s3-p1","s3-p2","s3-p4"], pc: "glow-path-rose" },
+
+    { c: 8, e: "PANEO 3: Pasamos al tercer elif. La última esperanza.", cam: 3, b: 4, s: "s4-dock-assign", v: "55", col: "bg-cyan-400 scale-100", on: "s4-node-assign", p: ["s4-p1"], pc: "glow-path-cyan" },
+    { c: 8, e: "ESCENA 4: ¿[55] >= 60? FALSO.", cam: 3, b: 4, s: "s4-dock-hole", v: "False", col: "bg-rose-500 text-white scale-100", on: "s4-node-cond", p: ["s4-p1","s4-p2"], pc: "glow-path-cyan" },
+    { c: 11, e: "Como todas las condiciones fallaron, caemos inevitablemente en el bloque 'else' (print 'F').", cam: 3, b: 4, s: "s4-dock-portal", v: "False", col: "bg-rose-500 scale-0 opacity-0", on: "s4-node-false", dim: "s4-node-true", p: ["s4-p1","s4-p2","s4-p4"], pc: "glow-path-rose" }
+  ]
+};
+
+const totalScenes = execution_data.sc.length;
+
+function buildUI() {
+  // 1. Code block
+  let codeHtml = '';
+  execution_data.c.split('\n').forEach((line, idx) => {
+    let n = idx + 1;
+    codeHtml += `<div id="code-${n}" class="px-2 py-1 transition-colors border-l-4 border-transparent"><span><span class="text-slate-500 mr-2 select-none">${n}</span><span class="whitespace-pre">${line}</span></span></div>`;
+  });
+  document.getElementById('code-block').innerHTML = codeHtml;
+
+  // 2. Camera Slider Size
+  const slider = document.getElementById('camera-slider');
+  slider.style.width = `${totalScenes * 100}%`;
+
+  // 3. Generate Scenes
+  let scenesHtml = '';
+  execution_data.sc.forEach((scene, index) => {
+    let sid = `s${scene.id}`;
+    
+    // Assign Block
+    let assignBlock = '';
+    if (scene.id === 1) {
+      assignBlock = `
+        <div id="${sid}-node-assign" class="absolute top-[50px] left-[175px] w-[150px] h-[60px] bg-slate-800 border-2 border-slate-600 rounded-lg flex items-center justify-center transition-all duration-300 gap-2">
+          <span class="font-mono font-bold text-slate-300 text-sm">score =</span>
+          <div id="${sid}-dock-assign" class="dock border-cyan-500/50"></div>
+        </div>`;
+    } else {
+      assignBlock = `
+        <div id="${sid}-node-assign" class="absolute top-[50px] left-[150px] w-[200px] h-[70px] bg-slate-800/50 border-2 border-slate-700 border-dashed rounded-lg flex flex-col items-center justify-center transition-all duration-300 opacity-60">
+          <span class="font-mono text-slate-400 text-[9px] mb-1 uppercase tracking-wider">Carried Value</span>
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-bold text-slate-300 text-sm">score =</span>
+            <div id="${sid}-dock-assign" class="dock border-cyan-500/50"></div>
+          </div>
+        </div>`;
+    }
+
+    // Portal / Else Block
+    let falseBlock = '';
+    if (scene.id === totalScenes) { 
+      // The final ELSE block
+      falseBlock = `
+        <div id="${sid}-node-false" class="absolute top-[280px] left-[305px] w-[150px] h-[60px] bg-slate-800 border-2 border-rose-500 rounded-md flex flex-col items-center justify-center transition-all duration-300 shadow-[0_0_15px_rgba(244,63,94,0)] relative">
+          <div id="${sid}-dock-portal" class="dock absolute opacity-0 scale-50"></div>
+          <span class="font-mono font-bold text-rose-400 text-sm">${scene.f}</span>
+        </div>`;
+    } else { 
+      // Intermediate Portal
+      falseBlock = `
+        <div id="${sid}-node-false" class="absolute top-[270px] left-[305px] w-[150px] h-[80px] bg-slate-800 border-2 border-purple-500 border-dashed rounded-md flex flex-col items-center justify-center transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+          <div id="${sid}-dock-portal" class="dock border-purple-500/50 mb-1"></div>
+          <span class="font-mono font-bold text-purple-400 text-xs">${scene.f}</span>
+        </div>`;
+    }
+
+    scenesHtml += `
+      <div class="scene" id="scene-${scene.id}" style="width: ${100 / totalScenes}%">
+        <svg class="absolute inset-0 w-full h-full pointer-events-none">
+          <path id="${sid}-p1" d="M 250 10 L 250 50" class="dim-path" fill="none"/>
+          <path id="${sid}-p2" d="M 250 120 L 250 150" class="dim-path" fill="none"/>
+          <path id="${sid}-p3" d="M 250 230 L 120 280" class="dim-path" fill="none"/>
+          <path id="${sid}-p4" d="M 250 230 L 380 280" class="dim-path" fill="none"/>
+        </svg>
+        
+        ${assignBlock}
+        
+        <div id="${sid}-node-cond" class="absolute top-[150px] left-[125px] w-[250px] h-[80px] bg-slate-800/80 border-2 border-slate-500 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
+          <span class="text-[9px] uppercase text-slate-400 font-bold mb-1 tracking-widest absolute top-1">Scene ${scene.id}</span>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="font-mono text-slate-400 text-sm">${scene.k}</span>
+            <div id="${sid}-dock-hole" class="dock border-yellow-500/50"></div>
+            <span class="font-mono font-bold text-yellow-300 text-lg">${scene.c}</span>
+          </div>
+        </div>
+
+        <div id="${sid}-node-true" class="absolute top-[280px] left-[45px] w-[150px] h-[60px] bg-slate-800 border-2 border-emerald-500 rounded-md flex flex-col items-center justify-center transition-all duration-300">
+          <span class="font-mono font-bold text-emerald-400 text-sm">${scene.t}</span>
+        </div>
+
+        ${falseBlock}
+
+        <div id="ball-${scene.id}" class="execution-ball absolute w-12 h-12 bg-slate-400 border-[3px] border-white rounded-full z-30 flex items-center justify-center font-black font-mono text-[10px] box-border scale-0 opacity-0" style="top: -100px; left: -100px;">
+          <span id="ball-${scene.id}-val"></span>
+        </div>
+      </div>
+    `;
+  });
+  slider.innerHTML = scenesHtml;
+}
 
 let i = 0;
 
-function moveToSlot(slotId) {
-  const container = document.getElementById('map-container');
-  const containerRect = container.getBoundingClientRect();
-  const slotRect = document.getElementById(slotId).getBoundingClientRect();
-  
-  // THE MATH FIX: Subtract the container's border widths (clientTop/clientLeft)
-  // because absolute positioning starts INSIDE the border, whereas getBoundingClientRect includes it.
-  const y = (slotRect.top - containerRect.top) - container.clientTop;
-  const x = (slotRect.left - containerRect.left) - container.clientLeft;
-  
-  const ball = document.getElementById('execution-ball');
+function placeBall(ballStr, slotId) {
+  const container = document.getElementById(`scene-${ballStr}`);
+  const slotEl = document.getElementById(slotId);
+  if(!slotEl || !container) return;
+  const cr = container.getBoundingClientRect();
+  const sr = slotEl.getBoundingClientRect();
+  const y = (sr.top - cr.top);
+  const x = (sr.left - cr.left);
+  const ball = document.getElementById(`ball-${ballStr}`);
   ball.style.top = y + 'px';
   ball.style.left = x + 'px';
 }
 
 function update() {
-  const step = steps[i];
-  document.getElementById('explanation-display').innerText = step.exp;
+  const step = execution_data.st[i];
+  document.getElementById('explanation-display').innerText = step.e;
   
-  [1,2,3,4,5,6].forEach(n => {
+  // Camera Pan Math
+  const slideAmount = (100 / totalScenes) * step.cam;
+  document.getElementById('camera-slider').style.transform = `translateX(-${slideAmount}%)`;
+  
+  // Code Highlighting
+  const lineCount = execution_data.c.split('\n').length;
+  for(let n=1; n<=lineCount; n++) {
     const el = document.getElementById(`code-${n}`);
-    el.classList.remove('bg-cyan-500/20', 'border-cyan-500', 'font-bold');
-    el.classList.add('border-transparent');
+    el.classList.remove('bg-cyan-500/20', 'border-cyan-500', 'font-bold', 'opacity-30', 'line-through');
     if (el.innerHTML.includes('⬅️')) el.innerHTML = el.innerHTML.replace('<span class="float-right animate-pulse text-cyan-500">⬅️</span>', '');
-    el.classList.remove('opacity-30', 'line-through');
-    
-    if (step.dimNode && n === 3) el.classList.add('opacity-30', 'line-through');
-  });
-  const act = document.getElementById(`code-${step.code}`);
-  act.classList.add('bg-cyan-500/20', 'border-cyan-500', 'font-bold');
-  act.classList.remove('border-transparent');
-  act.innerHTML += '<span class="float-right animate-pulse text-cyan-500">⬅️</span>';
-
-  // Ball Movement
-  moveToSlot(step.targetSlot);
-  
-  // Ball styling
-  const ball = document.getElementById('execution-ball');
-  const visibilityClass = step.ballVisible ? 'scale-100 opacity-100' : 'scale-0 opacity-0';
-  ball.className = `absolute w-12 h-12 border-[3px] border-white rounded-full z-30 flex items-center justify-center font-black font-mono box-border transition-all duration-700 ${step.ballColor} ${step.textScale || 'text-sm'} ${visibilityClass}`;
-  
-  if (step.ballVisible) {
-    ball.style.boxShadow = `0 0 15px ${step.shadow}`;
-  } else {
-    ball.style.boxShadow = 'none';
   }
-  document.getElementById('ball-val').innerText = step.ballTxt;
-
-  // Nodes
-  ['node-assign', 'node-cond', 'node-true', 'node-false', 'node-end'].forEach(id => {
-    document.getElementById(id).classList.remove('node-active', 'node-dim');
-  });
-  if(step.nodeOn) document.getElementById(step.nodeOn).classList.add('node-active');
-  if(step.dimNode) document.getElementById(step.dimNode).classList.add('node-dim');
-
-  // Paths
-  ['path-1', 'path-2', 'path-3-true', 'path-3-false', 'path-4-true', 'path-4-false'].forEach(id => {
-    const path = document.getElementById(id);
-    path.classList.remove('glow-path-cyan', 'glow-path-rose');
-    path.classList.add('dim-path');
-  });
+  const act = document.getElementById(`code-${step.c}`);
+  act.classList.add('bg-cyan-500/20', 'border-cyan-500', 'font-bold');
+  act.innerHTML += '<span class="float-right animate-pulse text-cyan-500">⬅️</span>';
   
-  if (step.pathOn) {
-    step.pathOn.forEach(id => {
-      document.getElementById(id).classList.remove('dim-path');
-      document.getElementById(id).classList.add(step.pathColor);
+  // Dynamic Dimming of previous true blocks in code
+  if(step.cam >= 1) document.getElementById('code-3').classList.add('opacity-30', 'line-through');
+  if(step.cam >= 2) document.getElementById('code-5').classList.add('opacity-30', 'line-through');
+  if(step.cam >= 3) document.getElementById('code-7').classList.add('opacity-30', 'line-through');
+  if(step.dim === 's4-node-true') document.getElementById('code-9').classList.add('opacity-30', 'line-through');
+
+  // Active Ball
+  placeBall(step.b, step.s);
+  const ball = document.getElementById(`ball-${step.b}`);
+  ball.className = `execution-ball absolute w-12 h-12 border-[3px] border-white rounded-full z-30 flex items-center justify-center font-black font-mono box-border transition-all duration-700 ${step.col}`;
+  ball.style.boxShadow = step.col.includes('opacity-0') ? 'none' : `0 0 15px rgba(255,255,255,0.4)`;
+  document.getElementById(`ball-${step.b}-val`).innerText = step.v;
+
+  // Hide inactive balls
+  execution_data.sc.forEach(s => {
+    if (s.id != step.b) {
+      const ob = document.getElementById(`ball-${s.id}`);
+      if(ob) ob.classList.add('scale-0', 'opacity-0');
+    }
+  });
+
+  // Reset node styles
+  execution_data.sc.forEach(s => {
+    ['node-assign', 'node-cond', 'node-true', 'node-false'].forEach(n => {
+      document.getElementById(`s${s.id}-${n}`).classList.remove('node-active', 'node-dim');
+    });
+    ['p1', 'p2', 'p3', 'p4'].forEach(p => {
+      document.getElementById(`s${s.id}-${p}`).classList.remove('glow-path-cyan', 'glow-path-rose', 'glow-path-emerald');
+      document.getElementById(`s${s.id}-${p}`).classList.add('dim-path');
+    });
+  });
+
+  // Apply new styles
+  if(step.on) document.getElementById(step.on).classList.add('node-active');
+  if(step.dim) document.getElementById(step.dim).classList.add('node-dim');
+  if(step.p) {
+    step.p.forEach(pId => {
+      document.getElementById(pId).classList.remove('dim-path');
+      document.getElementById(pId).classList.add(step.pc);
     });
   }
 
   document.getElementById('btn-prev').disabled = i === 0;
-  document.getElementById('btn-next').disabled = i === steps.length - 1;
+  document.getElementById('btn-next').disabled = i === execution_data.st.length - 1;
 }
 
-document.getElementById('btn-next').onclick = () => { if(i<steps.length-1) { i++; update(); } };
+document.getElementById('btn-next').onclick = () => { if(i<execution_data.st.length-1) { i++; update(); } };
 document.getElementById('btn-prev').onclick = () => { if(i>0) { i--; update(); } };
+window.addEventListener('resize', () => placeBall(execution_data.st[i].b, execution_data.st[i].s));
 
-window.addEventListener('resize', () => moveToSlot(steps[i].targetSlot));
-window.onload = () => {
-  // Move ball to start immediately, then animate to step 0
-  moveToSlot('slot-start');
-  setTimeout(update, 50); 
+window.onload = () => { 
+  buildUI();
+  setTimeout(() => {
+    placeBall(1, 's1-dock-assign');
+    update();
+  }, 100);
 };
 </script>
 </body>
