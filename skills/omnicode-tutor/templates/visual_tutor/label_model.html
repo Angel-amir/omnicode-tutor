@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2">
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-xl p-4 shadow-sm flex flex-col gap-4 relative">
+    
+    <div class="flex justify-between items-end">
+      <div>
+        <h2 class="font-semibold text-lg flex items-center gap-2">🏷️ The Label Model: Name Binding</h2>
+        <p class="text-[var(--muted-foreground)] text-sm">Variables are tags pointing to objects.</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="btn-prev" disabled class="px-3 py-1 bg-[var(--background)] border border-[var(--border)] rounded-md text-sm hover:bg-slate-100 disabled:opacity-50 transition-colors">Prev</button>
+        <button id="btn-next" class="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 disabled:opacity-50 transition-colors">Next</button>
+      </div>
+    </div>
+
+    <div class="flex flex-row gap-4 relative min-h-[350px]">
+      
+      <!-- Code Panel -->
+      <div class="w-1/3 flex flex-col gap-2">
+        <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider">Python Code</h3>
+        <div id="code-block" class="bg-[var(--background)] rounded-md border border-[var(--border)] py-2 font-mono text-xs overflow-x-auto flex-grow">
+          <!-- Code injected here -->
+        </div>
+      </div>
+
+      <!-- Object Space -->
+      <div class="w-2/3 flex flex-col gap-2 relative bg-blue-50/50 dark:bg-slate-800/50 border border-blue-100 dark:border-slate-700 rounded-lg p-3 overflow-hidden" id="object-space">
+        <h3 class="text-xs font-bold text-blue-500 uppercase tracking-wider text-center z-0">Object Space</h3>
+        
+        <!-- Objects Container -->
+        <div class="absolute bottom-10 w-full flex justify-center gap-8 items-end px-4 z-10" id="objects-container">
+          <!-- Objects injected here -->
+        </div>
+
+        <!-- Labels (Tags) injected absolutely over the space -->
+        <div id="labels-container" class="absolute inset-0 z-20 pointer-events-none">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Explanation -->
+    <div class="bg-blue-500/10 border-l-4 border-blue-500 p-3 rounded-r-md mt-2">
+      <p class="text-sm" id="explanation-display">Loading...</p>
+    </div>
+
+  </div>
+
+<script>
+/** -------------------------------------------------------------
+ * OMNICODE TUTOR CONTRACT AREA
+ * ------------------------------------------------------------- */
+const execution_data = {
+  code: "wallet = 50\nsavings = wallet\nsavings = 100",
+  steps: [
+    {
+      line: 1,
+      explanation: "Python evaluates the number 50 and creates an integer object in memory. Then, it creates a label called 'wallet' and binds it to that object.",
+      objects: [ { id: "obj_50", val: "50", type: "int" } ],
+      labels: [ { id: "lbl_wallet", name: "wallet", target: "obj_50" } ]
+    },
+    {
+      line: 2,
+      explanation: "We do 'savings = wallet'. Python does NOT duplicate the 50. It simply creates a second label called 'savings' and sticks it onto the EXACT SAME object.",
+      objects: [ { id: "obj_50", val: "50", type: "int" } ],
+      labels: [ 
+        { id: "lbl_wallet", name: "wallet", target: "obj_50" },
+        { id: "lbl_savings", name: "savings", target: "obj_50" }
+      ]
+    },
+    {
+      line: 3,
+      explanation: "The Bug: We assign 'savings = 100'. This does NOT change the 50! Reassignment simply tears the 'savings' label off the 50 and sticks it onto a NEW object (100). The 'wallet' label is completely unaffected and stays on 50.",
+      objects: [ 
+        { id: "obj_50", val: "50", type: "int" },
+        { id: "obj_100", val: "100", type: "int", highlight: true }
+      ],
+      labels: [ 
+        { id: "lbl_wallet", name: "wallet", target: "obj_50" },
+        { id: "lbl_savings", name: "savings", target: "obj_100" }
+      ]
+    }
+  ]
+};
+/** ------------------------------------------------------------- */
+
+let currentStepIndex = 0;
+// Track existing labels to animate them smoothly
+let activeLabels = {}; 
+
+function renderCode(activeLine) {
+  const codeLines = execution_data.code.split('\\n');
+  const codeHtml = codeLines.map(function(line, index) {
+    const lineNum = index + 1;
+    const isActive = lineNum === activeLine;
+    const bgClass = isActive ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400 border-l-2 border-blue-500 font-bold' : 'text-[var(--foreground)] border-l-2 border-transparent';
+    const arrow = isActive ? '<span class="float-right animate-pulse">⬅️</span>' : '';
+    
+    return '<div class="px-2 py-0.5 flex justify-between transition-colors ' + bgClass + '">' +
+             '<span><span class="text-[var(--muted-foreground)] mr-2 select-none">' + lineNum + '</span>' + line + '</span>' +
+             arrow +
+           '</div>';
+  }).join('');
+  document.getElementById('code-block').innerHTML = codeHtml;
+}
+
+function getObjectStyles(type, highlight) {
+  let styles = "w-20 h-20 rounded-full border-2 flex flex-col items-center justify-center shadow-sm transition-all duration-500 ";
+  if (type === 'int' || type === 'float') {
+    styles += "border-green-400 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 ";
+  } else if (type === 'str') {
+    styles += "border-purple-400 bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 ";
+  } else if (type === 'list') {
+    styles += "border-orange-400 bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 rounded-lg "; // Lists are squares
+  } else {
+    styles += "border-slate-400 bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 ";
+  }
+  
+  if (highlight) {
+    styles += "ring-4 ring-blue-300 scale-110 ";
+  }
+  return styles;
+}
+
+function renderObjects(objects) {
+  const container = document.getElementById('objects-container');
+  // Keep existing objects to animate them, add new ones, remove old ones
+  const currentIds = objects.map(o => o.id);
+  
+  // Create or update
+  objects.forEach(obj => {
+    let el = document.getElementById(obj.id);
+    if (!el) {
+      el = document.createElement('div');
+      el.id = obj.id;
+      // Start faded out for entry animation
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      container.appendChild(el);
+    }
+    el.className = getObjectStyles(obj.type, obj.highlight);
+    el.innerHTML = '<span class="font-mono font-bold text-lg">' + obj.val + '</span><span class="text-[9px] uppercase opacity-60">' + obj.type + '</span>';
+    
+    // Trigger reflow to apply entry animation
+    void el.offsetWidth;
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  });
+
+  // Remove missing
+  Array.from(container.children).forEach(child => {
+    if (currentIds.indexOf(child.id) === -1) {
+      child.style.opacity = '0';
+      child.style.transform = 'translateY(20px)';
+      setTimeout(() => { if(child.parentNode) child.parentNode.removeChild(child); }, 500);
+    }
+  });
+}
+
+function positionLabels(labels) {
+  const container = document.getElementById('labels-container');
+  const spaceRect = document.getElementById('object-space').getBoundingClientRect();
+  
+  // Track how many labels are targeting the same object so we can offset them
+  const targetCounts = {};
+  
+  labels.forEach(lbl => {
+    targetCounts[lbl.target] = (targetCounts[lbl.target] || 0) + 1;
+    const offsetIndex = targetCounts[lbl.target] - 1;
+    
+    let el = document.getElementById(lbl.id);
+    if (!el) {
+      el = document.createElement('div');
+      el.id = lbl.id;
+      el.className = "absolute bg-yellow-300 text-yellow-900 border-2 border-yellow-500 px-3 py-1 rounded shadow-md font-mono font-bold text-sm transition-all duration-700 ease-in-out pointer-events-none";
+      el.innerText = lbl.name;
+      // Initial position (center top)
+      el.style.left = '50%';
+      el.style.top = '10%';
+      el.style.opacity = '0';
+      container.appendChild(el);
+      activeLabels[lbl.id] = el;
+    }
+
+    // Find target object
+    const targetEl = document.getElementById(lbl.target);
+    if (targetEl) {
+      const targetRect = targetEl.getBoundingClientRect();
+      
+      // Calculate center of target object relative to object-space
+      const centerX = targetRect.left - spaceRect.left + (targetRect.width / 2);
+      const topY = targetRect.top - spaceRect.top;
+      
+      // Horizontal offset if multiple labels hit the same object
+      const xOffset = (offsetIndex * 15) - 30; // Stack slightly overlapping or offset
+      const yOffset = (offsetIndex * -15) - 40; // Stack upwards
+      
+      // Center the label itself (subtract half its width)
+      el.style.transform = 'translate(-50%, 0)'; 
+      el.style.left = (centerX + xOffset) + 'px';
+      el.style.top = (topY + yOffset) + 'px';
+      el.style.opacity = '1';
+    }
+  });
+
+  // Remove old labels
+  const currentIds = labels.map(l => l.id);
+  Object.keys(activeLabels).forEach(id => {
+    if (currentIds.indexOf(id) === -1) {
+      const el = activeLabels[id];
+      el.style.opacity = '0';
+      el.style.top = '10%';
+      setTimeout(() => { if(el.parentNode) el.parentNode.removeChild(el); delete activeLabels[id]; }, 700);
+    }
+  });
+}
+
+function renderStep(index) {
+  const step = execution_data.steps[index];
+  
+  renderCode(step.line);
+  document.getElementById('explanation-display').innerText = step.explanation;
+
+  renderObjects(step.objects);
+  
+  // We need a tiny delay to ensure objects are rendered in the DOM so we can get their coordinates for the labels
+  setTimeout(() => {
+    positionLabels(step.labels);
+  }, 50);
+
+  updateButtons();
+}
+
+function updateButtons() {
+  document.getElementById('btn-prev').disabled = currentStepIndex === 0;
+  document.getElementById('btn-next').disabled = currentStepIndex === execution_data.steps.length - 1;
+}
+
+document.getElementById('btn-next').addEventListener('click', function() {
+  if (currentStepIndex < execution_data.steps.length - 1) {
+    currentStepIndex++;
+    renderStep(currentStepIndex);
+  }
+});
+
+document.getElementById('btn-prev').addEventListener('click', function() {
+  if (currentStepIndex > 0) {
+    currentStepIndex--;
+    renderStep(currentStepIndex);
+  }
+});
+
+window.onload = function() {
+  if (execution_data && execution_data.steps.length > 0) {
+    renderStep(0);
+  }
+};
+</script>
+</body>
+</html>
