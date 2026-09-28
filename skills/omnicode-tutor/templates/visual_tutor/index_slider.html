@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2">
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-xl p-4 shadow-sm flex flex-col gap-4 relative">
+    
+    <div class="flex justify-between items-end">
+      <div>
+        <h2 class="font-semibold text-lg flex items-center gap-2">📏 The Index Slider: Slicing & Indices</h2>
+        <p class="text-[var(--muted-foreground)] text-sm">Visualizing zero-based and negative indexing.</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="btn-prev" disabled class="px-3 py-1 bg-[var(--background)] border border-[var(--border)] rounded-md text-sm hover:bg-slate-100 disabled:opacity-50 transition-colors">Prev</button>
+        <button id="btn-next" class="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 disabled:opacity-50 transition-colors">Next</button>
+      </div>
+    </div>
+
+    <div class="flex flex-row gap-4 min-h-[300px]">
+      
+      <!-- Code Panel -->
+      <div class="w-1/3 flex flex-col gap-2">
+        <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider">Python Code</h3>
+        <div id="code-block" class="bg-[var(--background)] rounded-md border border-[var(--border)] py-2 font-mono text-xs overflow-x-auto flex-grow">
+          <!-- Code injected here -->
+        </div>
+      </div>
+
+      <!-- String Space Panel -->
+      <div class="w-2/3 flex flex-col gap-2 relative bg-purple-50/50 dark:bg-purple-900/10 border border-purple-100 dark:border-purple-800/50 rounded-lg p-4 overflow-hidden justify-center items-center">
+        <h3 class="text-xs font-bold text-purple-500 uppercase tracking-wider absolute top-3">Sequence Memory</h3>
+        
+        <div id="string-container" class="flex gap-2 mt-4">
+          <!-- Characters will be injected here -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Explanation -->
+    <div class="bg-purple-500/10 border-l-4 border-purple-500 p-3 rounded-r-md mt-2">
+      <p class="text-sm" id="explanation-display">Loading...</p>
+    </div>
+
+  </div>
+
+<script>
+/** -------------------------------------------------------------
+ * OMNICODE TUTOR CONTRACT AREA
+ * ------------------------------------------------------------- */
+const execution_data = {
+  code: 'word = "PYTHON"\nprint(word[0])\nprint(word[-1])\nprint(word[1:4])',
+  steps: [
+    {
+      line: 1,
+      explanation: "A string is a sequence of characters. Each character gets its own slot in memory. Python assigns a positive index (starting at 0) and a negative index (starting at -1 from the end).",
+      word: "PYTHON",
+      highlight: [] 
+    },
+    {
+      line: 2,
+      explanation: "Accessing index 0. Python looks at the very first slot. Remember, computer scientists start counting from zero!",
+      word: "PYTHON",
+      highlight: [0] 
+    },
+    {
+      line: 3,
+      explanation: "Negative indexing! Index -1 always grabs the exact LAST character. This is super useful because you don't need to know how long the string is.",
+      word: "PYTHON",
+      highlight: [5] 
+    },
+    {
+      line: 4,
+      explanation: "Slicing [1:4]. The golden rule of slicing: start at the first number (1), and go UP TO but NOT INCLUDING the second number (4). So it grabs indices 1, 2, and 3.",
+      word: "PYTHON",
+      highlight: [1, 2, 3] 
+    }
+  ]
+};
+/** ------------------------------------------------------------- */
+
+let currentStepIndex = 0;
+
+function renderCode(activeLine) {
+  const codeLines = execution_data.code.split('\n');
+  const codeHtml = codeLines.map(function(line, index) {
+    const lineNum = index + 1;
+    const isActive = lineNum === activeLine;
+    const bgClass = isActive ? 'bg-purple-500/20 text-purple-700 dark:text-purple-400 border-l-4 border-purple-500 font-bold' : 'text-[var(--foreground)] border-l-4 border-transparent';
+    const arrow = isActive ? '<span class="float-right animate-pulse text-purple-500">⬅️</span>' : '';
+    
+    return '<div class="px-2 py-1 flex justify-between transition-colors ' + bgClass + '">' +
+             '<span><span class="text-[var(--muted-foreground)] mr-3 select-none">' + lineNum + '</span>' + line + '</span>' +
+             arrow +
+           '</div>';
+  }).join('');
+  document.getElementById('code-block').innerHTML = codeHtml;
+}
+
+function renderString(step) {
+  const container = document.getElementById('string-container');
+  const length = step.word.length;
+  
+  let html = '';
+  for (let i = 0; i < length; i++) {
+    const char = step.word[i];
+    const isHighlighted = step.highlight.includes(i);
+    const anyHighlighted = step.highlight.length > 0;
+    
+    // Style logic
+    const boxBg = isHighlighted ? 'bg-purple-500 text-white shadow-lg ring-4 ring-purple-300 scale-110' : 'bg-white text-slate-700 border-2 border-slate-200';
+    const opacity = (!isHighlighted && anyHighlighted) ? 'opacity-40' : 'opacity-100';
+    
+    html += `
+      <div class="flex flex-col items-center gap-2 transition-all duration-500 ${opacity}">
+        <!-- Positive Index -->
+        <span class="text-xs font-mono font-bold text-slate-400">${i}</span>
+        
+        <!-- Character Box -->
+        <div class="w-12 h-14 rounded-md flex items-center justify-center font-mono font-bold text-2xl transition-all duration-500 ${boxBg} z-10">
+          ${char}
+        </div>
+        
+        <!-- Negative Index -->
+        <span class="text-xs font-mono font-bold text-rose-400">${i - length}</span>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+}
+
+function renderStep(index) {
+  const step = execution_data.steps[index];
+  renderCode(step.line);
+  document.getElementById('explanation-display').innerText = step.explanation;
+  renderString(step);
+  updateButtons();
+}
+
+function updateButtons() {
+  document.getElementById('btn-prev').disabled = currentStepIndex === 0;
+  document.getElementById('btn-next').disabled = currentStepIndex === execution_data.steps.length - 1;
+}
+
+document.getElementById('btn-next').addEventListener('click', function() {
+  if (currentStepIndex < execution_data.steps.length - 1) {
+    currentStepIndex++;
+    renderStep(currentStepIndex);
+  }
+});
+
+document.getElementById('btn-prev').addEventListener('click', function() {
+  if (currentStepIndex > 0) {
+    currentStepIndex--;
+    renderStep(currentStepIndex);
+  }
+});
+
+window.onload = function() {
+  if (execution_data && execution_data.steps.length > 0) {
+    renderStep(0);
+  }
+};
+</script>
+</body>
+</html>
