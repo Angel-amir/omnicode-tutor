@@ -94,15 +94,15 @@ let currentStepIndex = 0;
 let activeLabels = {}; 
 
 function renderCode(activeLine) {
-  const codeLines = execution_data.code.split('\\n');
+  const codeLines = execution_data.code.split('\n');
   const codeHtml = codeLines.map(function(line, index) {
     const lineNum = index + 1;
     const isActive = lineNum === activeLine;
-    const bgClass = isActive ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400 border-l-2 border-blue-500 font-bold' : 'text-[var(--foreground)] border-l-2 border-transparent';
-    const arrow = isActive ? '<span class="float-right animate-pulse">⬅️</span>' : '';
+    const bgClass = isActive ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400 border-l-4 border-blue-500 font-bold' : 'text-[var(--foreground)] border-l-4 border-transparent';
+    const arrow = isActive ? '<span class="float-right animate-pulse text-blue-500">⬅️</span>' : '';
     
-    return '<div class="px-2 py-0.5 flex justify-between transition-colors ' + bgClass + '">' +
-             '<span><span class="text-[var(--muted-foreground)] mr-2 select-none">' + lineNum + '</span>' + line + '</span>' +
+    return '<div class="px-2 py-1 flex justify-between transition-colors ' + bgClass + '">' +
+             '<span><span class="text-[var(--muted-foreground)] mr-3 select-none">' + lineNum + '</span>' + line + '</span>' +
              arrow +
            '</div>';
   }).join('');
