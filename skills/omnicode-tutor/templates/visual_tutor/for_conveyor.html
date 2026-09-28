@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    .execution-ball { transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .dim-path { stroke: #334155; stroke-width: 4; transition: all 0.5s; stroke-dasharray: 8 8; }
+    .glow-path-cyan { stroke: #06b6d4; stroke-width: 6; filter: drop-shadow(0 0 5px #06b6d4); transition: all 0.5s; stroke-dasharray: none; }
+    .glow-path-purple { stroke: #a855f7; stroke-width: 6; filter: drop-shadow(0 0 5px #a855f7); transition: all 0.5s; stroke-dasharray: none; }
+    
+    .hopper-glass { background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.0) 100%); border: 2px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); }
+    
+    .item-ball { transition: all 0.5s ease-out; }
+    .claw-machine { transition: top 0.4s ease-out, height 0.4s ease-out; }
+  </style>
+</head>
+<body class="bg-transparent text-[var(--foreground)] antialiased p-2">
+  <div class="bg-[var(--card)] text-[var(--foreground)] border border-[var(--border)] rounded-xl p-4 shadow-sm flex flex-col gap-4 relative">
+    
+    <div class="flex justify-between items-end">
+      <div>
+        <h2 class="font-semibold text-lg flex items-center gap-2">🏭 The For Loop: Conveyor Belt</h2>
+        <p class="text-[var(--muted-foreground)] text-sm">Visualizing iterables, automatic assignment, and exhaustion.</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="btn-prev" disabled class="px-3 py-1 bg-[var(--background)] border border-[var(--border)] rounded-md text-sm transition-colors">Prev</button>
+        <button id="btn-next" class="px-3 py-1 bg-cyan-500 text-white rounded-md text-sm hover:bg-cyan-600 transition-colors">Next</button>
+      </div>
+    </div>
+
+    <div class="flex flex-row gap-4 h-[450px]">
+      
+      <!-- Code Panel -->
+      <div class="w-1/3 flex flex-col gap-2 relative">
+        <h3 class="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider">Python Code</h3>
+        <div id="code-block" class="bg-[var(--background)] rounded-md border border-[var(--border)] py-2 font-mono text-xs overflow-x-auto flex-grow">
+          <div class="px-2 py-1 transition-colors border-l-4 border-transparent" id="code-1">1  fruits = ["Apple", "Kiwi"]</div>
+          <div class="px-2 py-1 transition-colors border-l-4 border-transparent" id="code-2">2  for item in fruits:</div>
+          <div class="px-2 py-1 transition-colors border-l-4 border-transparent pl-6" id="code-3">3      print(item)</div>
+          <div class="px-2 py-1 transition-colors border-l-4 border-transparent" id="code-4">4  print("Done")</div>
+        </div>
+
+        <!-- Global State Panel -->
+        <div class="absolute bottom-4 left-4 right-4 bg-slate-800 border-2 border-slate-600 rounded-lg p-3 shadow-lg">
+           <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Variables in Memory</span>
+           <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-amber-300 font-bold">fruits =</span>
+                <span class="font-mono text-slate-300 text-xs">["Apple", "Kiwi"]</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sky-300 font-bold">item =</span>
+                <div id="var-item" class="w-16 h-6 bg-slate-700 rounded border border-slate-500 flex items-center justify-center font-mono font-bold text-xs text-white transition-all duration-300">?</div>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- Logic Map Panel -->
+      <div class="w-2/3 bg-slate-900 rounded-lg border-4 border-slate-800 shadow-inner relative overflow-hidden" id="map-container">
+        
+        <!-- Background Paths -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
+          <path id="path-drop" d="M 150 120 L 150 180" class="dim-path" fill="none"/>
+          <path id="path-arena" d="M 150 220 L 150 260" class="dim-path" fill="none"/>
+          <path id="path-recycle" d="M 150 300 L 150 350 Q 150 380 110 380 L 50 380 Q 20 380 20 340 L 20 180 Q 20 140 50 140 L 120 140" class="dim-path" fill="none"/>
+          <!-- Exit Path (when hopper is empty) -->
+          <path id="path-exit" d="M 190 70 L 320 70 Q 360 70 360 110 L 360 380" class="dim-path" fill="none"/>
+        </svg>
+
+        <!-- THE HOPPER (List/Data Source) -->
+        <div class="absolute top-[20px] left-[150px] -translate-x-1/2 w-[160px] h-[90px] hopper-glass rounded-b-3xl z-10 flex flex-col items-center pt-1 shadow-lg">
+           <span class="text-[9px] uppercase font-bold text-amber-400 mb-1">Hopper (fruits)</span>
+           
+           <!-- Hopper Items -->
+           <div class="flex gap-2 relative w-full justify-center h-[40px]">
+             <div id="item-2" class="item-ball absolute w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center font-bold text-[10px] text-white shadow-md" style="right: 25px;">Kiwi</div>
+             <div id="item-1" class="item-ball absolute w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center font-bold text-[10px] text-white shadow-md z-20" style="right: 65px;">Apple</div>
+           </div>
+
+           <!-- Empty indicator -->
+           <div id="hopper-empty" class="absolute inset-0 flex items-center justify-center bg-rose-900/80 rounded-b-3xl opacity-0 transition-opacity duration-300 z-30">
+             <span class="text-rose-200 font-black tracking-widest uppercase animate-pulse">Empty!</span>
+           </div>
+        </div>
+
+        <!-- THE AUTOMATIC ASSIGNMENT (for item in...) -->
+        <div class="absolute top-[130px] left-[150px] -translate-x-1/2 w-[240px] bg-slate-800 border-2 border-sky-500 rounded-lg shadow-lg z-10 flex flex-col p-2">
+           <span class="text-[9px] uppercase font-bold text-sky-400 text-center mb-1">Auto-Assign (for...in)</span>
+           <div class="bg-slate-900 rounded p-1 flex justify-center items-center gap-2">
+             <span class="font-mono text-slate-300 text-sm">item = <span id="assign-val" class="text-sky-300">___</span></span>
+           </div>
+           <!-- Dock -->
+           <div id="dock-assign" class="absolute -top-3 left-[50%] -translate-x-1/2 w-8 h-8 rounded-full border-2 border-dashed border-sky-500/50"></div>
+        </div>
+
+        <!-- THE ARENA (Loop Body) -->
+        <div class="absolute top-[190px] left-[150px] -translate-x-1/2 w-[200px] h-[90px] border-2 border-emerald-500/40 bg-emerald-900/20 rounded-xl z-10 flex flex-col items-center justify-around py-2">
+           <span class="absolute -top-3 bg-slate-900 px-2 text-[10px] uppercase font-bold text-emerald-400">Loop Arena</span>
+           
+           <div class="w-[140px] bg-slate-800 border border-slate-600 rounded flex items-center justify-center py-1 mt-2">
+             <div id="dock-print" class="w-8 h-8 rounded-full border-2 border-dashed border-slate-500 absolute left-8"></div>
+             <span class="font-mono text-sky-300 text-xs">print(item)</span>
+           </div>
+        </div>
+
+        <!-- Re-request Next Item (Recycle) -->
+        <div class="absolute top-[290px] left-[150px] -translate-x-1/2 w-[120px] bg-slate-800 border-2 border-slate-600 rounded-lg z-10 flex flex-col items-center p-1">
+           <div id="dock-recycle" class="w-8 h-8 rounded-full border-2 border-dashed border-slate-500/50 mb-1"></div>
+           <span class="text-[8px] uppercase font-bold text-slate-400">Fetch Next</span>
+        </div>
+
+        <!-- The Exit (Done) -->
+        <div class="absolute top-[380px] left-[360px] -translate-x-1/2 w-[120px] bg-slate-800 border-2 border-purple-500 rounded-lg shadow-lg z-10 flex items-center justify-center py-2">
+           <div id="dock-end" class="w-8 h-8 rounded-full border-2 border-dashed border-purple-500/50 absolute -top-4"></div>
+           <span class="font-mono text-purple-300 text-sm">print("Done")</span>
+        </div>
+
+        <!-- The Execution Ball -->
+        <div id="exec-ball" class="execution-ball absolute w-10 h-10 border-[3px] border-white rounded-full z-40 flex items-center justify-center text-white font-black font-mono text-[9px] scale-0 opacity-0 shadow-[0_0_15px_rgba(255,255,255,0.5)]" style="top: 0px; left: 0px;">
+          <span id="ball-text"></span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Explanation -->
+    <div class="bg-amber-500/10 border-l-4 border-amber-500 p-3 rounded-r-md mt-2 h-[75px] flex items-center">
+      <p class="text-sm" id="explanation-display">Loading...</p>
+    </div>
+
+  </div>
+
+<script>
+const steps = [
+  { c: 1, e: "Paso 1: Se crea la lista 'fruits' en memoria. Visualmente, llenamos nuestra 'Tolva' (Hopper) con los dos elementos disponibles.", b: 0, items: [1, 2], v: "?" },
+  
+  // ITERATION 1: Apple
+  { c: 2, e: "Inicia el FOR. La Tolva expulsa su primer elemento ('Apple').", b: 1, doc: "dock-assign", col: "bg-amber-500", txt: "Apple", items: [0, 2], v: "?", p: ["path-drop"] },
+  { c: 2, e: "Asignación Automática: A diferencia del 'while', el 'for' toma este valor y automáticamente se lo asigna a la variable 'item'. ¡No tienes que hacerlo manual!", b: 1, doc: "dock-assign", col: "bg-sky-500", txt: "Apple", items: [0, 2], v: "Apple", p: ["path-drop"], pulseVal: 1 },
+  { c: 3, e: "Entramos a la Arena. Se ejecuta print(item), que imprime 'Apple'.", b: 1, doc: "dock-print", col: "bg-sky-500", txt: "Apple", items: [0, 2], v: "Apple", p: ["path-arena"] },
+  { c: 2, e: "El cuerpo del ciclo terminó. La bolita de 'Apple' es destruida y el ciclo regresa arriba para pedir el siguiente elemento.", b: 1, doc: "dock-recycle", col: "bg-slate-500", txt: "DEL", items: [0, 2], v: "Apple", p: ["path-recycle"] },
+
+  // ITERATION 2: Kiwi
+  { c: 2, e: "La Tolva expulsa su segundo elemento ('Kiwi').", b: 1, doc: "dock-assign", col: "bg-amber-600", txt: "Kiwi", items: [0, 0], v: "Apple", p: ["path-drop"] },
+  { c: 2, e: "Asignación Automática: La variable 'item' pierde el valor viejo ('Apple') y ahora es sobrescrita automáticamente con 'Kiwi'.", b: 1, doc: "dock-assign", col: "bg-sky-500", txt: "Kiwi", items: [0, 0], v: "Kiwi", p: ["path-drop"], pulseVal: 1 },
+  { c: 3, e: "Entramos a la Arena y ejecutamos print('Kiwi').", b: 1, doc: "dock-print", col: "bg-sky-500", txt: "Kiwi", items: [0, 0], v: "Kiwi", p: ["path-arena"] },
+  { c: 2, e: "Termina el ciclo. Regresamos arriba a pedir el siguiente elemento.", b: 1, doc: "dock-recycle", col: "bg-slate-500", txt: "DEL", items: [0, 0], v: "Kiwi", p: ["path-recycle"] },
+
+  // EXIT: Exhaustion
+  { c: 2, e: "¡La Tolva está VACÍA! Como ya no hay más elementos que sacar, el ciclo FOR termina naturalmente. (Data Exhaustion)", b: 0, items: [0, 0], v: "Kiwi", empty: 1 },
+  { c: 4, e: "Al terminar, somos desviados por el carril de salida (Exit). El programa continúa.", b: 1, doc: "dock-end", col: "bg-purple-500", txt: "Done", items: [0, 0], v: "Kiwi", empty: 1, p: ["path-exit"] },
+];
+
+let current = 0;
+
+function centerBall(dockId) {
+  const container = document.getElementById('map-container');
+  const dockEl = document.getElementById(dockId);
+  if(!dockEl) return;
+  const cr = container.getBoundingClientRect();
+  const dr = dockEl.getBoundingClientRect();
+  const ball = document.getElementById('exec-ball');
+  
+  const y = (dr.top - cr.top - container.clientTop) + (dr.height/2) - 20;
+  const x = (dr.left - cr.left - container.clientLeft) + (dr.width/2) - 20;
+  
+  ball.style.top = y + 'px';
+  ball.style.left = x + 'px';
+}
+
+function update() {
+  const step = steps[current];
+  document.getElementById('explanation-display').innerText = step.e;
+  
+  // Code Highlighting
+  [1,2,3,4].forEach(n => {
+    const el = document.getElementById(`code-${n}`);
+    el.classList.remove('bg-cyan-500/20', 'border-cyan-500', 'font-bold');
+    if (el.innerHTML.includes('⬅️')) el.innerHTML = el.innerHTML.replace('<span class="float-right animate-pulse text-cyan-500">⬅️</span>', '');
+  });
+  if(step.c) {
+    const act = document.getElementById(`code-${step.c}`);
+    act.classList.add('bg-cyan-500/20', 'border-cyan-500', 'font-bold');
+    act.innerHTML += '<span class="float-right animate-pulse text-cyan-500">⬅️</span>';
+  }
+
+  // Global Variable
+  const varBox = document.getElementById('var-item');
+  varBox.innerText = step.v;
+  if(step.pulseVal) {
+    varBox.classList.add('bg-sky-600', 'border-sky-400', 'scale-110');
+  } else {
+    varBox.classList.remove('bg-sky-600', 'border-sky-400', 'scale-110');
+  }
+  document.getElementById('assign-val').innerText = step.v;
+
+  // Hopper Items
+  const item1 = document.getElementById('item-1');
+  const item2 = document.getElementById('item-2');
+  
+  if(step.items[0]) {
+    item1.style.top = '40px'; item1.style.opacity = '1'; item1.style.transform = 'scale(1)';
+  } else {
+    // Drop animation out of hopper
+    item1.style.top = '100px'; item1.style.opacity = '0'; item1.style.transform = 'scale(0)';
+  }
+  
+  if(step.items[1]) {
+    if(step.items[0]) {
+      // Behind item 1
+      item2.style.top = '20px'; item2.style.opacity = '0.8'; item2.style.transform = 'scale(0.8)';
+    } else {
+      // Moves to front position
+      item2.style.top = '40px'; item2.style.opacity = '1'; item2.style.transform = 'scale(1)';
+    }
+  } else {
+    // Drop animation out of hopper
+    item2.style.top = '100px'; item2.style.opacity = '0'; item2.style.transform = 'scale(0)';
+  }
+
+  // Hopper Empty State
+  const emptySign = document.getElementById('hopper-empty');
+  if(step.empty) {
+    emptySign.classList.replace('opacity-0', 'opacity-100');
+  } else {
+    emptySign.classList.replace('opacity-100', 'opacity-0');
+  }
+
+  // Paths
+  ['path-drop', 'path-arena', 'path-recycle', 'path-exit'].forEach(p => {
+    document.getElementById(p).classList.remove('glow-path-cyan', 'glow-path-purple');
+    document.getElementById(p).classList.add('dim-path');
+  });
+  if(step.p) {
+    step.p.forEach(p => {
+      document.getElementById(p).classList.remove('dim-path');
+      document.getElementById(p).classList.add(step.empty ? 'glow-path-purple' : 'glow-path-cyan');
+    });
+  }
+
+  // Ball Movement
+  const ball = document.getElementById('exec-ball');
+  const ballText = document.getElementById('ball-text');
+  if(step.b) {
+    centerBall(step.doc);
+    ballText.innerText = step.txt;
+    ball.className = `execution-ball absolute w-10 h-10 border-[3px] border-white rounded-full z-40 flex items-center justify-center text-white font-black font-mono text-[10px] scale-100 opacity-100 shadow-[0_0_15px_rgba(255,255,255,0.5)] ${step.col}`;
+  } else {
+    ball.classList.replace('scale-100', 'scale-0');
+    ball.classList.replace('opacity-100', 'opacity-0');
+  }
+
+  document.getElementById('btn-prev').disabled = current === 0;
+  document.getElementById('btn-next').disabled = current === steps.length - 1;
+}
+
+document.getElementById('btn-next').onclick = () => { if(current<steps.length-1) { current++; update(); } };
+document.getElementById('btn-prev').onclick = () => { if(current>0) { current--; update(); } };
+window.addEventListener('resize', () => { if(steps[current].b) centerBall(steps[current].b.doc); });
+
+window.onload = () => { setTimeout(update, 100); };
+</script>
+</body>
+</html>
